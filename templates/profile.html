@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profile - AI Grading Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/theme.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center" href="/evaluation.html">
+                <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                <span class="fw-bold">AI Grading Platform</span>
+            </a>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <a href="/dashboard.html" class="btn btn-sm btn-outline-secondary">Dashboard</a>
+                <a href="/evaluation.html" class="btn btn-sm btn-outline-secondary">Evaluation</a>
+                <a href="/analytics.html" class="btn btn-sm btn-outline-secondary">Analytics</a>
+                <div class="dropdown">
+                    <button class="btn btn-light btn-sm dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                        <img id="userProfileImage" class="rounded-circle" style="width: 24px; height: 24px;" alt="User">
+                        <span id="userDisplayName"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/profile.html">Profile</a></li>
+                        <li><button class="dropdown-item text-danger" onclick="handleLogout()">Logout</button></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container py-4" style="margin-top: 80px;">
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3">Loading your profile...</p>
+        </div>
+
+        <!-- Profile Content -->
+        <div id="profile-content" class="d-none">
+            <div class="row">
+                <div class="col-md-4">
+                    <!-- Profile Card -->
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center">
+                            <img id="profilePicture" class="rounded-circle mb-3" style="width: 120px; height: 120px;" alt="Profile Picture">
+                            <h4 id="profileName" class="mb-1"></h4>
+                            <p id="profileEmail" class="text-muted mb-3"></p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <span id="profileStatus" class="badge bg-success">Active</span>
+                                <span id="googleConnected" class="badge bg-primary">
+                                    <i class="fab fa-google me-1"></i>Connected
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google Integration Card -->
+                    <div class="card mt-3 shadow-sm">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fab fa-google me-2"></i>Google Integration</h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="google-connected-info" class="d-none">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <small class="text-muted">Classroom Access</small>
+                                    <span id="google-status-badge" class="badge bg-success">Connected</span>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <small class="text-muted">Credentials Status</small>
+                                    <span id="credentials-status" class="badge bg-success">Valid</span>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <small class="text-muted">Last Sync</small>
+                                    <small id="lastSync" class="text-muted"></small>
+                                </div>
+                                <div class="d-flex gap-2 mt-3">
+                                    <button id="refresh-google-btn" class="btn btn-sm btn-outline-primary flex-fill">
+                                        <i class="fas fa-sync-alt me-1"></i> Refresh Status
+                                    </button>
+                                    <button id="relink-google-btn" class="btn btn-sm btn-outline-warning flex-fill">
+                                        <i class="fas fa-link me-1"></i> Re-link Account
+                                    </button>
+                                </div>
+                                <button id="unlink-google-btn" class="btn btn-sm btn-outline-danger w-100 mt-2">
+                                    <i class="fas fa-unlink me-1"></i> Unlink Account
+                                </button>
+                            </div>
+                            <div id="google-not-connected" class="d-none text-center">
+                                <p class="text-muted mb-3">Connect your Google Classroom account to access courses and assignments.</p>
+                                <button id="connect-google-profile-btn" class="btn btn-primary btn-sm">
+                                    <i class="fab fa-google me-2"></i> Connect Google Classroom
+                                </button>
+                            </div>
+                            <div id="google-status-message" class="mt-2 small text-muted"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <!-- Account Information -->
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-user me-2"></i>Account Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <strong>Name:</strong>
+                                </div>
+                                <div class="col-sm-9">
+                                    <span id="accountName"></span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <strong>Email:</strong>
+                                </div>
+                                <div class="col-sm-9">
+                                    <span id="accountEmail"></span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <strong>Account Type:</strong>
+                                </div>
+                                <div class="col-sm-9">
+                                    <span class="badge bg-info">Teacher</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <strong>Member Since:</strong>
+                                </div>
+                                <div class="col-sm-9">
+                                    <span id="memberSince"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preferences -->
+                    <div class="card mt-3 shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Preferences</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <strong>Theme:</strong>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="theme" id="light-theme" value="light" checked>
+                                        <label class="form-check-label" for="light-theme">Light</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="theme" id="dark-theme" value="dark">
+                                        <label class="form-check-label" for="dark-theme">Dark</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="theme" id="auto-theme" value="auto">
+                                        <label class="form-check-label" for="auto-theme">Auto</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <strong>Notifications:</strong>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="email-notifications" checked>
+                                        <label class="form-check-label" for="email-notifications">Email notifications</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="grading-notifications" checked>
+                                        <label class="form-check-label" for="grading-notifications">Grading completion alerts</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <strong>Language:</strong>
+                                </div>
+                                <div class="col-sm-8">
+                                    <select class="form-select form-select-sm" style="width: auto;">
+                                        <option selected>English</option>
+                                        <option>Spanish</option>
+                                        <option>French</option>
+                                        <option>German</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="card mt-3 shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Activity</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="recent-activity-list">
+                                <!-- Recent activity items will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="card mt-3 shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Statistics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <div class="d-flex flex-column">
+                                        <span id="totalAssignments" class="fs-2 fw-bold text-primary">0</span>
+                                        <small class="text-muted">Total Assignments</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex flex-column">
+                                        <span id="totalSubmissions" class="fs-2 fw-bold text-success">0</span>
+                                        <small class="text-muted">Total Submissions</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex flex-column">
+                                        <span id="totalGraded" class="fs-2 fw-bold text-warning">0</span>
+                                        <small class="text-muted">Graded</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex flex-column">
+                                        <span id="avgGrade" class="fs-2 fw-bold text-info">0</span>
+                                        <small class="text-muted">Avg Grade</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Error State -->
+    <div id="error-state" class="d-none text-center py-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <h4>Unable to Load Profile</h4>
+                <p class="text-muted mb-3">There was an error loading your profile information.</p>
+                <button onclick="window.location.reload()" class="btn btn-primary">
+                    <i class="fas fa-refresh me-2"></i>Try Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/api.js"></script>
+    
+    <script>
+        // Profile page functionality
+        class ProfilePage {
+            constructor() {
+                this.init();
+            }
+
+            async init() {
+                try {
+                    // Check authentication
+                    const user = await this.getCurrentUser();
+                    if (!user) {
+                        window.location.href = '/';
+                        return;
+                    }
+
+                    // Load profile data
+                    await this.loadProfile(user);
+                    await this.loadGoogleIntegration();
+                    await this.loadRecentActivity();
+                    await this.loadStatistics();
+                    
+                    // Setup event listeners
+                    this.setupEventListeners();
+                    
+                    // Show profile content
+                    this.showContent();
+                    
+                    // Check for URL parameters (e.g., account linking success)
+                    this.checkUrlParameters();
+                    
+                } catch (error) {
+                    console.error('Error initializing profile:', error);
+                    this.showError();
+                }
+            }
+
+            checkUrlParameters() {
+                const urlParams = new URLSearchParams(window.location.search);
+                
+                if (urlParams.has('linked')) {
+                    if (urlParams.get('linked') === 'true') {
+                        this.showAlert('Google account linked successfully!', 'success');
+                        // Reload Google integration status
+                        this.loadGoogleIntegration();
+                    } else {
+                        this.showAlert('Failed to link Google account. Please try again.', 'danger');
+                    }
+                    
+                    // Clean up URL parameters
+                    const cleanUrl = window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }
+            }
+
+            async getCurrentUser() {
+                try {
+                    const response = await fetch('/api/users/me', {
+                        credentials: 'include'
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to get user info');
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error getting user:', error);
+                    return null;
+                }
+            }
+
+            async loadProfile(user) {
+                // Update profile information
+                document.getElementById('profilePicture').src = user.picture || '/static/images/default-avatar.png';
+                document.getElementById('profileName').textContent = user.name || 'Unknown User';
+                document.getElementById('profileEmail').textContent = user.email || 'No email';
+                document.getElementById('userProfileImage').src = user.picture || '/static/images/default-avatar.png';
+                document.getElementById('userDisplayName').textContent = user.name || 'User';
+                
+                // Account information
+                document.getElementById('accountName').textContent = user.name || 'Unknown User';
+                document.getElementById('accountEmail').textContent = user.email || 'No email';
+                
+                // Member since (mock data for now)
+                const memberSince = new Date().toLocaleDateString();
+                document.getElementById('memberSince').textContent = memberSince;
+            }
+
+            async loadGoogleIntegration() {
+                try {
+                    // Check credentials status first
+                    const credentialsResponse = await fetch('/api/classroom/credentials-status', {
+                        credentials: 'include'
+                    });
+                    
+                    if (credentialsResponse.ok) {
+                        const credentialsData = await credentialsResponse.json();
+                        
+                        if (credentialsData.has_credentials) {
+                            // User has credentials, show connected UI
+                            document.getElementById('google-connected-info').classList.remove('d-none');
+                            document.getElementById('google-not-connected').classList.add('d-none');
+                            document.getElementById('googleConnected').innerHTML = '<i class="fab fa-google me-1"></i>Connected';
+                            document.getElementById('googleConnected').classList.remove('bg-secondary');
+                            document.getElementById('googleConnected').classList.add('bg-primary');
+                            
+                            // Update status based on credential validity
+                            const statusBadge = document.getElementById('google-status-badge');
+                            const credentialsStatusBadge = document.getElementById('credentials-status');
+                            const statusMessage = document.getElementById('google-status-message');
+                            
+                            if (credentialsData.valid) {
+                                statusBadge.className = 'badge bg-success';
+                                statusBadge.textContent = 'Connected';
+                                credentialsStatusBadge.className = 'badge bg-success';
+                                credentialsStatusBadge.textContent = 'Valid';
+                                statusMessage.textContent = 'Your Google account is connected and credentials are valid.';
+                                statusMessage.className = 'mt-2 small text-success';
+                            } else {
+                                statusBadge.className = 'badge bg-warning';
+                                statusBadge.textContent = 'Connected';
+                                credentialsStatusBadge.className = 'badge bg-warning';
+                                credentialsStatusBadge.textContent = 'Expired';
+                                statusMessage.textContent = 'Your Google credentials have expired. Please re-link your account.';
+                                statusMessage.className = 'mt-2 small text-warning';
+                            }
+                            
+                            // Set last sync time
+                            document.getElementById('lastSync').textContent = new Date().toLocaleString();
+                        } else {
+                            // No credentials, show not connected UI
+                            document.getElementById('google-connected-info').classList.add('d-none');
+                            document.getElementById('google-not-connected').classList.remove('d-none');
+                            document.getElementById('googleConnected').innerHTML = '<i class="fab fa-google me-1"></i>Not Connected';
+                            document.getElementById('googleConnected').classList.remove('bg-primary');
+                            document.getElementById('googleConnected').classList.add('bg-secondary');
+                            
+                            const statusMessage = document.getElementById('google-status-message');
+                            statusMessage.textContent = 'No Google account linked. Connect your account to access Google Classroom.';
+                            statusMessage.className = 'mt-2 small text-muted';
+                        }
+                    } else {
+                        // Error checking credentials
+                        document.getElementById('google-connected-info').classList.add('d-none');
+                        document.getElementById('google-not-connected').classList.remove('d-none');
+                        document.getElementById('googleConnected').textContent = 'Error';
+                        document.getElementById('googleConnected').classList.remove('bg-primary');
+                        document.getElementById('googleConnected').classList.add('bg-danger');
+                        
+                        const statusMessage = document.getElementById('google-status-message');
+                        statusMessage.textContent = 'Error checking Google account status. Please try again.';
+                        statusMessage.className = 'mt-2 small text-danger';
+                    }
+                } catch (error) {
+                    console.error('Error checking Google integration:', error);
+                    document.getElementById('google-connected-info').classList.add('d-none');
+                    document.getElementById('google-not-connected').classList.remove('d-none');
+                    document.getElementById('googleConnected').textContent = 'Error';
+                    document.getElementById('googleConnected').classList.remove('bg-primary');
+                    document.getElementById('googleConnected').classList.add('bg-danger');
+                    
+                    const statusMessage = document.getElementById('google-status-message');
+                    statusMessage.textContent = 'Error checking Google account status. Please try again.';
+                    statusMessage.className = 'mt-2 small text-danger';
+                }
+            }
+
+            async loadRecentActivity() {
+                try {
+                    const response = await fetch('/api/profile/recent-activity', {
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        const activities = await response.json();
+                        this.displayRecentActivity(activities);
+                    } else {
+                        // Show mock data if endpoint doesn't exist
+                        this.displayRecentActivity([
+                            { type: 'grading', description: 'Graded Assignment: Math Test', time: '2 hours ago' },
+                            { type: 'submission', description: 'New submissions received', time: '1 day ago' },
+                            { type: 'login', description: 'Logged in', time: '3 days ago' }
+                        ]);
+                    }
+                } catch (error) {
+                    console.error('Error loading recent activity:', error);
+                    this.displayRecentActivity([]);
+                }
+            }
+
+            displayRecentActivity(activities) {
+                const container = document.getElementById('recent-activity-list');
+                
+                if (activities.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center">No recent activity</p>';
+                    return;
+                }
+
+                container.innerHTML = activities.map(activity => `
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="me-3">
+                            <i class="fas fa-${this.getActivityIcon(activity.type)} text-muted"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-medium">${activity.description}</div>
+                            <small class="text-muted">${activity.time}</small>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            getActivityIcon(type) {
+                const icons = {
+                    'grading': 'check-circle',
+                    'submission': 'file-alt',
+                    'login': 'sign-in-alt',
+                    'default': 'circle'
+                };
+                return icons[type] || icons.default;
+            }
+
+            async loadStatistics() {
+                try {
+                    const response = await fetch('/api/profile/statistics', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const stats = await response.json();
+                        this.displayStatistics(stats);
+                    } else {
+                        // Show mock data if endpoint doesn't exist
+                        this.displayStatistics({
+                            totalAssignments: 12,
+                            totalSubmissions: 156,
+                            totalGraded: 142,
+                            avgGrade: 85.2
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error loading statistics:', error);
+                    this.displayStatistics({
+                        totalAssignments: 0,
+                        totalSubmissions: 0,
+                        totalGraded: 0,
+                        avgGrade: 0
+                    });
+                }
+            }
+
+            displayStatistics(stats) {
+                document.getElementById('totalAssignments').textContent = stats.totalAssignments || 0;
+                document.getElementById('totalSubmissions').textContent = stats.totalSubmissions || 0;
+                document.getElementById('totalGraded').textContent = stats.totalGraded || 0;
+                document.getElementById('avgGrade').textContent = stats.avgGrade ? stats.avgGrade.toFixed(1) : '0.0';
+            }
+
+            setupEventListeners() {
+                // Google connection buttons
+                document.getElementById('connect-google-profile-btn')?.addEventListener('click', async () => {
+                    try {
+                        const response = await fetch('/api/classroom/auth-url?link_account=true', {
+                            credentials: 'include'
+                        });
+                        const data = await response.json();
+                        if (data.auth_url) {
+                            window.location.href = data.auth_url;
+                        } else {
+                            this.showAlert('Could not get authorization URL', 'danger');
+                        }
+                    } catch (error) {
+                        console.error('Error getting auth URL:', error);
+                        this.showAlert('Error connecting to Google', 'danger');
+                    }
+                });
+
+                document.getElementById('refresh-google-btn')?.addEventListener('click', () => {
+                    this.loadGoogleIntegration();
+                });
+
+                document.getElementById('relink-google-btn')?.addEventListener('click', async () => {
+                    try {
+                        const response = await fetch('/api/classroom/link-account-url', {
+                            credentials: 'include'
+                        });
+                        const data = await response.json();
+                        if (data.auth_url) {
+                            window.location.href = data.auth_url;
+                        } else {
+                            this.showAlert('Could not get authorization URL', 'danger');
+                        }
+                    } catch (error) {
+                        console.error('Error getting re-link URL:', error);
+                        this.showAlert('Error re-linking Google account', 'danger');
+                    }
+                });
+
+                document.getElementById('unlink-google-btn')?.addEventListener('click', async () => {
+                    if (confirm('Are you sure you want to unlink your Google account? This will remove access to Google Classroom features.')) {
+                        try {
+                            const response = await fetch('/api/classroom/unlink-account', {
+                                method: 'POST',
+                                credentials: 'include'
+                            });
+                            
+                            if (response.ok) {
+                                this.showAlert('Google account unlinked successfully', 'success');
+                                // Refresh the integration status
+                                this.loadGoogleIntegration();
+                            } else {
+                                this.showAlert('Error unlinking Google account', 'danger');
+                            }
+                        } catch (error) {
+                            console.error('Error unlinking Google account:', error);
+                            this.showAlert('Error unlinking Google account', 'danger');
+                        }
+                    }
+                });
+
+                // Theme switcher
+                document.querySelectorAll('input[name="theme"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const theme = e.target.value;
+                        document.documentElement.setAttribute('data-bs-theme', theme);
+                        localStorage.setItem('theme', theme);
+                    });
+                });
+
+                // Load saved theme
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme) {
+                    document.documentElement.setAttribute('data-bs-theme', savedTheme);
+                    document.getElementById(`${savedTheme}-theme`).checked = true;
+                }
+            }
+
+            showAlert(message, type = 'info') {
+                // Create alert element
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                // Insert at the top of the main content
+                const mainContent = document.querySelector('main');
+                mainContent.insertBefore(alertDiv, mainContent.firstChild);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 5000);
+            }
+
+            showContent() {
+                document.getElementById('loading-state').classList.add('d-none');
+                document.getElementById('profile-content').classList.remove('d-none');
+            }
+
+            showError() {
+                document.getElementById('loading-state').classList.add('d-none');
+                document.getElementById('error-state').classList.remove('d-none');
+            }
+        }
+
+        // Logout functionality
+        async function handleLogout() {
+            try {
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            } finally {
+                // Clear any localStorage data (just in case)
+                localStorage.removeItem('access_token');
+                // Redirect to login page
+                window.location.href = '/auth/login.html';
+            }
+        }
+
+        // Initialize profile page
+        document.addEventListener('DOMContentLoaded', () => {
+            new ProfilePage();
+        });
+    </script>
+</body>
+</html>

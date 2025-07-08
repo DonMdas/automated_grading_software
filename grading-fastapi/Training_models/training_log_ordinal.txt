@@ -1,0 +1,22 @@
+Features used: tf_idf_similarity, full_similarity_score, mean_similarity_score
+
+Model: LogisticAT (Ordinal Regression)
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0     0.3750    0.1500    0.2143        20
+           1     0.3214    0.4500    0.3750        20
+           2     0.1818    0.2000    0.1905        20
+           3     0.1818    0.1905    0.1860        21
+           4     0.1667    0.1500    0.1579        20
+           5     0.3182    0.3500    0.3333        20
+           6     0.3600    0.4286    0.3913        21
+           7     0.2727    0.2857    0.2791        21
+           8     0.4583    0.5500    0.5000        20
+           9     0.4615    0.3000    0.3636        20
+          10     1.0000    0.9500    0.9744        20
+
+    accuracy                         0.3632       223
+   macro avg     0.3725    0.3641    0.3605       223
+weighted avg     0.3711    0.3632    0.3595       223

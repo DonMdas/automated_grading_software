@@ -1,0 +1,48 @@
+# Docker Compose for Development with Local Databases
+version: '3.8'
+
+services:
+  # Main AI Grading Application
+  ai-grading-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # Database Configuration (using external/on-premise databases)
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+      
+      # MongoDB Configuration (using external/on-premise MongoDB)
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${MONGODB_PORT:-27017}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
+      
+      # Google OAuth Configuration
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+      
+      # Application Configuration
+      - SECRET_KEY=${SECRET_KEY}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      
+      # Grading Service URL (not needed - integrated into main app)
+      # - GRADING_SERVICE_URL=http://grading-service:8001
+    volumes:
+      - ./server_data:/app/server_data
+      - ./static:/app/static
+      - ./templates:/app/templates
+      - ./grading-fastapi:/app/grading-fastapi
+      - ./training_data:/app/training_data
+    networks:
+      - ai-grading-network
+    restart: unless-stopped
+
+networks:
+  ai-grading-network:
+    driver: bridge

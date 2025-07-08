@@ -1,0 +1,23 @@
+Features used: tf_idf_similarity, full_similarity_score, mean_similarity_score
+
+Best Parameters:
+{'max_depth': 10, 'min_samples_leaf': 1, 'min_samples_split': 5, 'n_estimators': 200}
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0     0.4091    0.4500    0.4286        20
+           1     0.3684    0.3500    0.3590        20
+           2     0.3182    0.3500    0.3333        20
+           3     0.1875    0.1429    0.1622        21
+           4     0.0714    0.0500    0.0588        20
+           5     0.3571    0.5000    0.4167        20
+           6     0.3750    0.4286    0.4000        21
+           7     0.4000    0.2857    0.3333        21
+           8     0.2500    0.2000    0.2222        20
+           9     0.4815    0.6500    0.5532        20
+          10     1.0000    1.0000    1.0000        20
+
+    accuracy                         0.3991       223
+   macro avg     0.3835    0.4006    0.3879       223
+weighted avg     0.3826    0.3991    0.3867       223

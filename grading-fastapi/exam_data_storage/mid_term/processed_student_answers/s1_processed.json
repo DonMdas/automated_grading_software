@@ -1,0 +1,61 @@
+{
+    "92": {
+        "original_answer": "A compiler is a program that translates source code written in a high-level programming language into machine code or bytecode. The main phases include lexical analysis (scanning), syntax analysis (parsing), semantic analysis, code generation, and optimization. Each phase processes the code differently to produce efficient executable output.",
+        "full_similarity_score": 0.6466070419327454,
+        "tfidf_similarity_score": 0.10389331003412992,
+        "structure_similarity_scores": [
+            0.4112492819728295,
+            0.4148176635986711,
+            0.3789339171751466,
+            0.5971566599010942
+        ],
+        "mean_structure_similarity_score": 0.45053938066193533,
+        "total_structure_components": 4,
+        "structure": {
+            "distance": "",
+            "duration": "",
+            "fare": "",
+            "method": "A compiler is a program that translates source code written in a high-level programming language into machine code or bytecode. The main phases include lexical analysis (scanning), syntax analysis (parsing), semantic analysis, code generation, and optimization. Each phase processes the code differently to produce efficient executable output."
+        },
+        "predicted_grade": "1",
+        "requires_llm_evaluation": []
+    },
+    "93": {
+        "original_answer": "Inheritance in object-oriented programming allows a class to inherit properties and methods from another class. The parent class is called a superclass or base class, while the child class is called a subclass or derived class. This promotes code reuse and establishes an 'is-a' relationship between classes.",
+        "full_similarity_score": 0.5983945284853418,
+        "tfidf_similarity_score": 0.10642210144169847,
+        "structure_similarity_scores": [
+            0.41955116425711825,
+            0.4101904796433646,
+            0.3530748235779197
+        ],
+        "mean_structure_similarity_score": 0.3942721558261342,
+        "total_structure_components": 3,
+        "structure": {
+            "action": "Inheritance in object-oriented programming allows a class to inherit properties and methods from another class.",
+            "result_of_action": "The parent class is called a superclass or base class, while the child class is called a subclass or derived class. This promotes code reuse and establishes an 'is-a' relationship between classes.",
+            "description": ""
+        },
+        "predicted_grade": "0",
+        "requires_llm_evaluation": []
+    },
+    "94": {
+        "original_answer": "A database management system (DBMS) is software that manages and organizes data in databases. Key features include data storage, retrieval, security, backup and recovery, and transaction management. Examples include MySQL, PostgreSQL, and Oracle Database.",
+        "full_similarity_score": 0.633845348735961,
+        "tfidf_similarity_score": 0.031521486040073876,
+        "structure_similarity_scores": [
+            0.5486326478553141,
+            0.5216660687736793,
+            0.4668848933790376
+        ],
+        "mean_structure_similarity_score": 0.5123945366693436,
+        "total_structure_components": 3,
+        "structure": {
+            "savings_method": "A database management system (DBMS) is software that manages and organizes data in databases.",
+            "challenges": "Key features include data storage, retrieval, security, backup and recovery, and transaction management.",
+            "major_sacrifice": "Examples include MySQL, PostgreSQL, and Oracle Database."
+        },
+        "predicted_grade": "1",
+        "requires_llm_evaluation": []
+    }
+}

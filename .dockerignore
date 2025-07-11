@@ -1,0 +1,117 @@
+# Docker ignore file
+# Ignore files that shouldn't be included in Docker builds
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# Data directories
+server_data/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.gitlab-ci.yml
+.github/
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite3
+app_data.db
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Documentation
+*.md
+docs/
+
+# Large model files (should be mounted as volumes)
+Model_files/
+Saved_models/
+Training_models/
+
+# Test files
+tests/
+test_*/
+*_test.py
+*_tests.py
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Static analysis
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Backup files
+*.bak
+*.backup
+
+# SSL certificates (security)
+*.pem
+*.key
+*.crt
+ssl/

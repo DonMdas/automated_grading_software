@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Studio Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .analytics-card {
+            transition: all 0.3s ease;
+        }
+        .analytics-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .tab-active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .insight-card {
+            border-left: 4px solid;
+        }
+        .insight-success { border-left-color: #10b981; }
+        .insight-warning { border-left-color: #f59e0b; }
+        .insight-danger { border-left-color: #ef4444; }
+        .insight-info { border-left-color: #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-chart-line text-blue-600 text-2xl mr-3"></i>
+                        <h1 class="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a href="/dashboard.html" class="px-4 py-2 text-gray-600 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-home mr-2"></i>Dashboard
+                        </a>
+                        <a href="/evaluation.html" class="px-4 py-2 text-gray-600 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-clipboard-check mr-2"></i>Evaluation
+                        </a>
+                        <a href="/profile.html" class="px-4 py-2 text-gray-600 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-user mr-2"></i>Profile
+                        </a>
+                        <select id="courseSelect" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select Course</option>
+                        </select>
+                        <button id="demoBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-play mr-2"></i>View Demo
+                        </button>
+                        <button id="refreshBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            <i class="fas fa-sync-alt mr-2"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Loading State -->
+            <div id="loadingState" class="flex justify-center items-center py-20">
+                <div class="loading-spinner"></div>
+                <span class="ml-3 text-gray-600">Loading analytics...</span>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="hidden">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">Error Loading Analytics</h3>
+                    <p id="errorMessage" class="text-red-600 mb-4"></p>
+                    <button id="retryBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                        <i class="fas fa-redo mr-2"></i>Retry
+                    </button>
+                </div>
+            </div>
+
+            <!-- Analytics Content -->
+            <div id="analyticsContent" class="hidden">
+                <!-- Demo Data Notice -->
+                <div id="demoNotice" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-info-circle text-blue-500 mr-3"></i>
+                        <div>
+                            <h4 class="text-blue-800 font-semibold">Demo Data</h4>
+                            <p class="text-blue-700 text-sm">You're viewing sample analytics data. To see real data, ensure you have graded assignments and select a course with actual submissions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="bg-white rounded-lg shadow mb-6">
+                    <nav class="flex space-x-1 p-1">
+                        <button class="tab-btn tab-active px-6 py-3 rounded-lg font-medium" data-tab="overview">
+                            <i class="fas fa-tachometer-alt mr-2"></i>Overview
+                        </button>
+                        <button class="tab-btn px-6 py-3 rounded-lg font-medium" data-tab="questions">
+                            <i class="fas fa-question-circle mr-2"></i>Questions
+                        </button>
+                        <button class="tab-btn px-6 py-3 rounded-lg font-medium" data-tab="students">
+                            <i class="fas fa-users mr-2"></i>Students
+                        </button>
+                        <button class="tab-btn px-6 py-3 rounded-lg font-medium" data-tab="class">
+                            <i class="fas fa-school mr-2"></i>Class
+                        </button>
+                        <button class="tab-btn px-6 py-3 rounded-lg font-medium" data-tab="teacher">
+                            <i class="fas fa-chalkboard-teacher mr-2"></i>Teacher
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Overview Tab -->
+                <div id="overviewTab" class="tab-content">
+                    <!-- Key Metrics -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">Class Average</p>
+                                    <p id="classAverage" class="metric-value">-</p>
+                                </div>
+                                <div class="p-3 bg-blue-100 rounded-lg">
+                                    <i class="fas fa-chart-line text-blue-600 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">Pass Rate</p>
+                                    <p id="passRate" class="metric-value">-</p>
+                                </div>
+                                <div class="p-3 bg-green-100 rounded-lg">
+                                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">Total Students</p>
+                                    <p id="totalStudents" class="metric-value">-</p>
+                                </div>
+                                <div class="p-3 bg-purple-100 rounded-lg">
+                                    <i class="fas fa-users text-purple-600 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">High Performers</p>
+                                    <p id="highPerformers" class="metric-value">-</p>
+                                </div>
+                                <div class="p-3 bg-yellow-100 rounded-lg">
+                                    <i class="fas fa-star text-yellow-600 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold mb-4">Performance Distribution</h3>
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold mb-4">Top Performers vs Class Average</h3>
+                            <canvas id="topPerformersChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Insights -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold mb-4">Most Missed Questions</h3>
+                            <div id="missedQuestions" class="space-y-3">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold mb-4">Key Insights</h3>
+                            <div id="keyInsights" class="space-y-3">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Questions Tab -->
+                <div id="questionsTab" class="tab-content hidden">
+                    <div class="grid grid-cols-1 gap-6">
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold mb-4">Question Analytics</h3>
+                            <div class="overflow-x-auto">
+                                <table id="questionsTable" class="min-w-full table-auto">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Question</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Avg Score</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Difficulty</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Success Rate</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Attempts</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="questionsTableBody" class="bg-white divide-y divide-gray-200">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Tab -->
+                <div id="studentsTab" class="tab-content hidden">
+                    <div class="grid grid-cols-1 gap-6">
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold mb-4">Student Performance</h3>
+                            <div class="overflow-x-auto">
+                                <table id="studentsTable" class="min-w-full table-auto">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Student ID</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Avg Grade</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Trend</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Accuracy</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Growth Rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentsTableBody" class="bg-white divide-y divide-gray-200">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Class Tab -->
+                <div id="classTab" class="tab-content hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold mb-4">Class Metrics</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Class Average:</span>
+                                    <span id="classMetricAvg" class="font-semibold">-</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Standard Deviation:</span>
+                                    <span id="classMetricStdDev" class="font-semibold">-</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Completion Rate:</span>
+                                    <span id="classMetricCompletion" class="font-semibold">-</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Top-Bottom Gap:</span>
+                                    <span id="classMetricGap" class="font-semibold">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold mb-4">Performance Breakdown</h3>
+                            <canvas id="classPerformanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Tab -->
+                <div id="teacherTab" class="tab-content hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold mb-4">Teaching Overview</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Total Courses:</span>
+                                    <span id="teacherTotalCourses" class="font-semibold">-</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Total Students:</span>
+                                    <span id="teacherTotalStudents" class="font-semibold">-</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Avg Class Performance:</span>
+                                    <span id="teacherAvgPerformance" class="font-semibold">-</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Students Needing Support:</span>
+                                    <span id="teacherSupportNeeded" class="font-semibold">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold mb-4">Course Performance</h3>
+                            <canvas id="teacherCoursesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentCourseId = '';
+        let analyticsData = {};
+        let charts = {};
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+            loadCourses();
+            // Don't auto-load demo data anymore - let loadCourses handle real data first
+        });
+
+        function initializeEventListeners() {
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+
+            // Course selection
+            document.getElementById('courseSelect').addEventListener('change', function() {
+                currentCourseId = this.value;
+                if (currentCourseId) {
+                    loadAnalytics();
+                }
+            });
+
+            // Refresh button
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                if (currentCourseId) {
+                    loadAnalytics();
+                }
+            });
+
+            // Demo button
+            document.getElementById('demoBtn').addEventListener('click', function() {
+                currentCourseId = 'demo_course_123';
+                document.getElementById('courseSelect').value = 'demo_course_123';
+                loadAnalytics();
+            });
+
+            // Retry button
+            document.getElementById('retryBtn').addEventListener('click', function() {
+                if (currentCourseId) {
+                    loadAnalytics();
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('tab-active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+        }
+
+        async function loadCourses() {
+            try {
+                // For now, always load demo data
+                console.log('Loading demo data only');
+                await loadDemoFallback();
+                
+            } catch (error) {
+                console.error('Error loading demo data:', error);
+                await loadDemoFallback();
+            }
+        }
+
+        async function loadDemoFallback() {
+            console.log('Loading demo data as fallback');
+            
+            // Set up demo course in dropdown
+            const courseSelect = document.getElementById('courseSelect');
+            courseSelect.innerHTML = '<option value="">Select Course</option>';
+            const option = document.createElement('option');
+            option.value = 'demo_course_123';
+            option.textContent = 'Demo Course (Sample Data)';
+            courseSelect.appendChild(option);
+            
+            // Auto-select demo course
+            courseSelect.value = 'demo_course_123';
+            currentCourseId = 'demo_course_123';
+            
+            console.log('Using demo course as fallback');
+            loadAnalytics();
+        }
+
+        async function loadAnalytics() {
+            if (!currentCourseId) return;
+
+            showLoading();
+
+            try {
+                // Always load demo data for now
+                console.log('Loading demo data as requested');
+                loadLocalDemoData();
+                renderAnalytics();
+                showContent();
+                return;
+
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                loadLocalDemoData();
+                renderAnalytics();
+                showContent();
+            }
+        }
+
+        function showAuthenticationMessage() {
+            const notice = document.getElementById('demoNotice');
+            notice.classList.remove('hidden');
+            notice.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-3"></i>
+                    <div>
+                        <h4 class="text-blue-800 font-semibold">Demo Data - Authentication Required</h4>
+                        <p class="text-blue-700 text-sm">Please <a href="/auth/login" class="underline">login</a> to view real analytics data. You're currently viewing sample data for demonstration.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showRealDataMessage() {
+            const notice = document.getElementById('demoNotice');
+            notice.classList.remove('hidden');
+            notice.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                    <div>
+                        <h4 class="text-green-800 font-semibold">Real Data Loaded</h4>
+                        <p class="text-green-700 text-sm">You're viewing real analytics data from your graded assignments and student submissions.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showNoDataMessage() {
+            const notice = document.getElementById('demoNotice');
+            notice.classList.remove('hidden');
+            notice.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle text-orange-500 mr-3"></i>
+                    <div>
+                        <h4 class="text-orange-800 font-semibold">No Real Data Available</h4>
+                        <p class="text-orange-700 text-sm">No grading data found for the selected course. Showing sample data for demonstration. Complete some assignments to see real analytics.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadLocalDemoData() {
+            // Show demo notice
+            document.getElementById('demoNotice').classList.remove('hidden');
+            
+            // Update demo notice content
+            const notice = document.getElementById('demoNotice');
+            notice.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-3"></i>
+                    <div>
+                        <h4 class="text-blue-800 font-semibold">Demo Data</h4>
+                        <p class="text-blue-700 text-sm">You're viewing sample analytics data for demonstration purposes. This showcases the full functionality of the analytics dashboard.</p>
+                    </div>
+                </div>
+            `;
+            
+            analyticsData = {
+                summary: {
+                    class_average: 82.3,
+                    pass_rate: 86.7,
+                    total_students: 28,
+                    high_performers: 8,
+                    performance_distribution: {
+                        '0-50': 10.7,
+                        '50-70': 21.4,
+                        '70-85': 39.3,
+                        '85-100': 28.6
+                    },
+                    top_performers: [
+                        { student: "Mukund Tekriwal", average_grade: 94.2 },
+                        { student: "Dhruv Jetty", average_grade: 91.8 },
+                        { student: "Rishi Reddy", average_grade: 89.5 }
+                    ]
+                },
+                questions: {
+                    "q1": {
+                        question_text: "What is the derivative of x²?",
+                        average_score: 88.5,
+                        difficulty: "medium",
+                        correct_answers: 24,
+                        total_attempts: 28
+                    },
+                    "q2": {
+                        question_text: "Solve the integral ∫x dx",
+                        average_score: 76.2,
+                        difficulty: "hard",
+                        correct_answers: 19,
+                        total_attempts: 28
+                    },
+                    "q3": {
+                        question_text: "What is the limit of (x²-1)/(x-1) as x approaches 1?",
+                        average_score: 92.1,
+                        difficulty: "easy",
+                        correct_answers: 26,
+                        total_attempts: 28
+                    },
+                    "q4": {
+                        question_text: "Find the critical points of f(x) = x³ - 3x² + 2x",
+                        average_score: 71.8,
+                        difficulty: "hard",
+                        correct_answers: 17,
+                        total_attempts: 28
+                    },
+                    "q5": {
+                        question_text: "Evaluate the definite integral ∫₀² x dx",
+                        average_score: 84.3,
+                        difficulty: "medium",
+                        correct_answers: 22,
+                        total_attempts: 28
+                    }
+                },
+                students: {
+                    "student_1": {
+                        name: "Mukund Tekriwal",
+                        average_score: 94.2,
+                        trend: "improving",
+                        accuracy: 96.5,
+                        growth_rate: 8.3
+                    },
+                    "student_2": {
+                        name: "Dhruv Jetty",
+                        average_score: 91.8,
+                        trend: "stable",
+                        accuracy: 89.2,
+                        growth_rate: 2.1
+                    },
+                    "student_3": {
+                        name: "Rishi Reddy",
+                        average_score: 89.5,
+                        trend: "improving",
+                        accuracy: 87.9,
+                        growth_rate: 15.2
+                    },
+                    "student_4": {
+                        name: "Deevan Kumar",
+                        average_score: 76.3,
+                        trend: "declining",
+                        accuracy: 78.9,
+                        growth_rate: -3.2
+                    },
+                    "student_5": {
+                        name: "Keeran Dhami",
+                        average_score: 83.4,
+                        trend: "stable",
+                        accuracy: 85.7,
+                        growth_rate: 1.8
+                    }
+                },
+                class: {
+                    class_average: 82.3,
+                    pass_rate: 86.7,
+                    total_students: 28,
+                    standard_deviation: 12.4,
+                    assignment_completion_rate: 92.3,
+                    top_bottom_gap: 45.8,
+                    performance_distribution: {
+                        '0-50': 10.7,
+                        '50-70': 21.4,
+                        '70-85': 39.3,
+                        '85-100': 28.6
+                    }
+                },
+                teacher: {
+                    total_courses: 3,
+                    overall_metrics: {
+                        total_students_taught: 84,
+                        average_class_performance: 82.3,
+                        student_support_needed: 8
+                    },
+                    courses: {
+                        "course_1": {
+                            course_name: "Advanced Calculus",
+                            student_count: 28,
+                            analytics: {
+                                class_average: 82.3,
+                                pass_rate: 86.7,
+                                engagement_score: 87.4
+                            }
+                        },
+                        "course_2": {
+                            course_name: "Linear Algebra",
+                            student_count: 32,
+                            analytics: {
+                                class_average: 79.1,
+                                pass_rate: 81.3,
+                                engagement_score: 83.9
+                            }
+                        },
+                        "course_3": {
+                            course_name: "Statistics",
+                            student_count: 24,
+                            analytics: {
+                                class_average: 85.7,
+                                pass_rate: 91.7,
+                                engagement_score: 89.2
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        function renderAnalytics() {
+            renderOverview();
+            renderQuestions();
+            renderStudents();
+            renderClass();
+            renderTeacher();
+        }
+
+        function renderOverview() {
+            const summary = analyticsData.summary || {};
+
+            // Update key metrics - use direct summary data
+            document.getElementById('classAverage').textContent = `${summary.class_average || 0}%`;
+            document.getElementById('passRate').textContent = `${summary.pass_rate || 0}%`;
+            document.getElementById('totalStudents').textContent = summary.total_students || 0;
+            
+            // Calculate high performers percentage
+            const highPerformersRate = summary.total_students > 0 ? 
+                ((summary.high_performers || 0) / summary.total_students * 100).toFixed(1) : 0;
+            document.getElementById('highPerformers').textContent = `${highPerformersRate}%`;
+
+            // Render performance distribution chart
+            renderPerformanceChart(summary.performance_distribution);
+
+            // Render top performers chart
+            renderTopPerformersChart(summary);
+
+            // Render most missed questions
+            renderMostMissedQuestions(analyticsData.questions);
+
+            // Render key insights
+            renderKeyInsights(summary);
+        }
+
+        function renderPerformanceChart(distribution) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            if (charts.performance) {
+                charts.performance.destroy();
+            }
+
+            charts.performance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['0-50%', '50-70%', '70-85%', '85-100%'],
+                    datasets: [{
+                        data: distribution ? [
+                            distribution['0-50'],
+                            distribution['50-70'],
+                            distribution['70-85'],
+                            distribution['85-100']
+                        ] : [0, 0, 0, 0],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTopPerformersChart(summary) {
+            const ctx = document.getElementById('topPerformersChart').getContext('2d');
+            
+            if (charts.topPerformers) {
+                charts.topPerformers.destroy();
+            }
+
+            const topPerformers = summary.top_performers || [];
+            const labels = topPerformers.map(p => p.student);
+            const data = topPerformers.map(p => p.average_grade);
+
+            charts.topPerformers = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Grade',
+                        data: data,
+                        backgroundColor: '#3b82f6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderMostMissedQuestions(questionsData) {
+            const container = document.getElementById('missedQuestions');
+            container.innerHTML = '';
+
+            if (!questionsData || Object.keys(questionsData).length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No data available</p>';
+                return;
+            }
+
+            // Convert questions data to array and calculate miss rates
+            const questions = Object.entries(questionsData).map(([id, data]) => ({
+                id,
+                question: data.question_text || `Question ${id}`,
+                failure_rate: data.total_attempts > 0 ? 
+                    ((data.total_attempts - data.correct_answers) / data.total_attempts * 100).toFixed(1) : 0
+            }));
+
+            // Sort by failure rate and take top 3
+            const mostMissed = questions
+                .sort((a, b) => parseFloat(b.failure_rate) - parseFloat(a.failure_rate))
+                .slice(0, 3);
+
+            mostMissed.forEach(q => {
+                const div = document.createElement('div');
+                div.className = 'insight-card insight-warning bg-yellow-50 p-3 rounded-lg';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-700 truncate">${q.question}</span>
+                        <span class="text-sm font-semibold text-yellow-700">${q.failure_rate}% missed</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderKeyInsights(summary) {
+            const container = document.getElementById('keyInsights');
+            container.innerHTML = '';
+
+            if (!summary) {
+                container.innerHTML = '<p class="text-gray-500">No insights available</p>';
+                return;
+            }
+
+            // Generate insights from summary data
+            const insightItems = [
+                { 
+                    label: 'Class Performance', 
+                    value: summary.class_average >= 80 ? 'Excellent' : summary.class_average >= 70 ? 'Good' : 'Needs Improvement', 
+                    type: summary.class_average >= 80 ? 'success' : summary.class_average >= 70 ? 'info' : 'danger' 
+                },
+                { 
+                    label: 'Pass Rate', 
+                    value: `${summary.pass_rate || 0}%`, 
+                    type: summary.pass_rate >= 80 ? 'success' : summary.pass_rate >= 70 ? 'warning' : 'danger' 
+                },
+                { 
+                    label: 'Grading Efficiency', 
+                    value: `${summary.grading_efficiency || 0}%`, 
+                    type: summary.grading_efficiency >= 90 ? 'success' : 'info' 
+                },
+                { 
+                    label: 'Response Time', 
+                    value: `${summary.response_time || 0} hrs`, 
+                    type: summary.response_time <= 2 ? 'success' : 'warning' 
+                }
+            ];
+
+            insightItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `insight-card insight-${item.type} bg-${item.type === 'success' ? 'green' : item.type === 'warning' ? 'yellow' : item.type === 'danger' ? 'red' : 'blue'}-50 p-3 rounded-lg`;
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-700">${item.label}</span>
+                        <span class="text-sm font-semibold">${item.value}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderQuestions() {
+            const tbody = document.getElementById('questionsTableBody');
+            tbody.innerHTML = '';
+
+            const questions = analyticsData.questions || {};
+
+            Object.entries(questions).forEach(([questionId, data]) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-2 text-sm text-gray-900 truncate max-w-xs">${questionId}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">${data.average_score}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">${data.difficulty_index}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">${data.correct_response_rate}%</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">${data.total_attempts}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderStudents() {
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '';
+
+            const students = analyticsData.students || {};
+
+            Object.entries(students).forEach(([studentId, data]) => {
+                const trendIcon = data.trend === 'improving' ? '📈' : 
+                                data.trend === 'declining' ? '📉' : '➡️';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-2 text-sm text-gray-900">${data.name || studentId}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">${(data.average_score || 0).toFixed(1)}%</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">${trendIcon} ${data.trend || 'stable'}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">${(data.accuracy || 0).toFixed(1)}%</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">${(data.growth_rate || 0).toFixed(1)}%</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderClass() {
+            const classData = analyticsData.class || {};
+
+            // Update class metrics
+            document.getElementById('classMetricAvg').textContent = `${classData.class_average || 0}%`;
+            document.getElementById('classMetricStdDev').textContent = classData.standard_deviation || 0;
+            document.getElementById('classMetricCompletion').textContent = `${classData.assignment_completion_rate || 0}%`;
+            document.getElementById('classMetricGap').textContent = `${classData.top_bottom_gap || 0} points`;
+
+            // Render class performance chart
+            renderClassPerformanceChart(classData.performance_distribution);
+        }
+
+        function renderClassPerformanceChart(distribution) {
+            const ctx = document.getElementById('classPerformanceChart').getContext('2d');
+            
+            if (charts.classPerformance) {
+                charts.classPerformance.destroy();
+            }
+
+            charts.classPerformance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['0-50%', '50-70%', '70-85%', '85-100%'],
+                    datasets: [{
+                        label: 'Percentage of Students',
+                        data: distribution ? [
+                            distribution['0-50'],
+                            distribution['50-70'],
+                            distribution['70-85'],
+                            distribution['85-100']
+                        ] : [0, 0, 0, 0],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTeacher() {
+            const teacherData = analyticsData.teacher || {};
+            const overallMetrics = teacherData.overall_metrics || {};
+
+            // Update teacher metrics
+            document.getElementById('teacherTotalCourses').textContent = teacherData.total_courses || 0;
+            document.getElementById('teacherTotalStudents').textContent = overallMetrics.total_students_taught || 0;
+            document.getElementById('teacherAvgPerformance').textContent = `${overallMetrics.average_class_performance || 0}%`;
+            document.getElementById('teacherSupportNeeded').textContent = overallMetrics.student_support_needed || 0;
+
+            // Render teacher courses chart
+            renderTeacherCoursesChart(teacherData.courses);
+        }
+
+        function renderTeacherCoursesChart(courses) {
+            const ctx = document.getElementById('teacherCoursesChart').getContext('2d');
+            
+            if (charts.teacherCourses) {
+                charts.teacherCourses.destroy();
+            }
+
+            if (!courses) {
+                return;
+            }
+
+            const labels = Object.values(courses).map(c => c.course_name);
+            const data = Object.values(courses).map(c => c.analytics.class_average || 0);
+
+            charts.teacherCourses = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Class Average',
+                        data: data,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function showLoading() {
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+            document.getElementById('analyticsContent').classList.add('hidden');
+        }
+
+        function showContent() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+            document.getElementById('analyticsContent').classList.remove('hidden');
+        }
+
+        function showError(message) {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('analyticsContent').classList.add('hidden');
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorState').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

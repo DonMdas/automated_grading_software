@@ -1,0 +1,38 @@
+[project]
+name = "aistudioversion"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi[standard]",
+    "uvicorn",
+    "python-jose[cryptography]",
+    "passlib",
+    "bcrypt==3.2.0",
+    "python-dotenv",
+    "aiohttp",
+    "google-auth",
+    "google-auth-oauthlib",
+    "google-api-python-client",
+    "itsdangerous",
+    "Jinja2",
+    "sqlalchemy",
+    "python-multipart",
+    "pdf2image",
+    "pytesseract",
+    "pillow",
+    "srsly>=2.5.1",
+    "pandas>=2.3.0",
+    "scikit-learn>=1.7.0",
+    "transformers>=4.53.1",
+    "torch>=2.7.1",
+    "google-generativeai>=0.8.5",
+    "joblib>=1.5.1",
+    "mord>=0.7",
+    "ollama>=0.5.1",
+    "xgboost>=3.0.2",
+    "psycopg2-binary>=2.9.10",
+    "pymongo>=4.13.2",
+]
+

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal AI Studio Test Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .section h2 {
+            color: #555;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .danger {
+            background-color: #f44336;
+        }
+        .danger:hover {
+            background-color: #da190b;
+        }
+        .warning {
+            background-color: #ff9800;
+        }
+        .warning:hover {
+            background-color: #e68900;
+        }
+        .info {
+            background-color: #2196F3;
+        }
+        .info:hover {
+            background-color: #0b7dda;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background-color: #dff0d8;
+            border: 1px solid #d6e9c6;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            border: 1px solid #ebccd1;
+            color: #a94442;
+        }
+        .info-result {
+            background-color: #d9edf7;
+            border: 1px solid #bce8f1;
+            color: #31708f;
+        }
+        .status-card {
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            min-width: 80px;
+        }
+        .status-pending { background-color: #ffc107; }
+        .status-downloaded { background-color: #17a2b8; }
+        .status-ocr-complete { background-color: #28a745; }
+        .status-ocr-failed { background-color: #dc3545; }
+        .status-graded { background-color: #6f42c1; }
+        .status-grading-failed { background-color: #fd7e14; }
+        .workflow-step {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+        .workflow-step.completed {
+            border-left-color: #28a745;
+            background-color: #d4edda;
+        }
+        .workflow-step.failed {
+            border-left-color: #dc3545;
+            background-color: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Universal AI Studio Test Tool</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            This tool works with any Google account and any Google Classroom.<br>
+            Test OCR processing, submission loading, and grading with your own classrooms.
+        </p>
+
+        <!-- Course and Assignment Setup -->
+        <div class="section">
+            <h2>📚 Course and Assignment Setup</h2>
+            <div class="form-group">
+                <label for="courseId">Course ID:</label>
+                <input type="text" id="courseId" placeholder="Enter Google Classroom Course ID">
+            </div>
+            <div class="form-group">
+                <label for="courseworkId">Coursework ID:</label>
+                <input type="text" id="courseworkId" placeholder="Enter Google Classroom Coursework ID">
+            </div>
+            <button onclick="debugClassroom()">🔍 Debug Classroom Data</button>
+            <button onclick="investigateAssignment()" class="info">🔎 Investigate Assignment</button>
+        </div>
+
+        <!-- Submission Management -->
+        <div class="section">
+            <h2>📝 Submission Management</h2>
+            <div class="workflow-step">
+                <strong>Step 1:</strong> Load submissions from Google Classroom
+                <br><button onclick="loadSubmissions()">📥 Load Submissions</button>
+            </div>
+            <div class="workflow-step">
+                <strong>Step 2:</strong> Process OCR for submitted files
+                <br><button onclick="triggerOCR()" class="warning">🔍 Process OCR</button>
+            </div>
+            <div class="workflow-step">
+                <strong>Step 3:</strong> Check submission status
+                <br><button onclick="checkSubmissionStatus()" class="info">📊 Check Status</button>
+            </div>
+            <button onclick="getSubmissionSummary()" class="info">📈 Get Summary</button>
+        </div>
+
+        <!-- OCR and Grading -->
+        <div class="section">
+            <h2>🤖 OCR and Grading</h2>
+            <div class="form-group">
+                <label for="gradingVersion">Grading Version:</label>
+                <select id="gradingVersion">
+                    <option value="v2">Version 2 (Recommended)</option>
+                    <option value="v1">Version 1</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="answerKey">Answer Key PDF (optional if already exists):</label>
+                <input type="file" id="answerKey" accept=".pdf">
+            </div>
+            <button onclick="evaluateNewSubmissions()" class="warning">🎯 Evaluate New Submissions</button>
+            <button onclick="evaluateAllSubmissions()" class="danger">🎯 Evaluate All Submissions</button>
+        </div>
+
+        <!-- Individual Student Processing -->
+        <div class="section">
+            <h2>👤 Individual Student Processing</h2>
+            <div class="form-group">
+                <label for="studentId">Student Google ID:</label>
+                <input type="text" id="studentId" placeholder="Enter specific student Google ID">
+            </div>
+            <button onclick="evaluateSingleSubmission()" class="info">🎯 Evaluate Single Student</button>
+        </div>
+
+        <!-- Results Display -->
+        <div class="section">
+            <h2>📊 Results</h2>
+            <div id="results" class="result info-result">
+                Results will appear here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Helper function to display results
+        function displayResult(data, isError = false) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.className = `result ${isError ? 'error' : 'success'}`;
+            resultsDiv.textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Helper function to get form values
+        function getFormValues() {
+            return {
+                courseId: document.getElementById('courseId').value.trim(),
+                courseworkId: document.getElementById('courseworkId').value.trim(),
+                gradingVersion: document.getElementById('gradingVersion').value,
+                studentId: document.getElementById('studentId').value.trim()
+            };
+        }
+
+        // Validate required fields
+        function validateRequired(courseId, courseworkId) {
+            if (!courseId || !courseworkId) {
+                alert('Please enter both Course ID and Coursework ID');
+                return false;
+            }
+            return true;
+        }
+
+        // Debug Classroom Data
+        async function debugClassroom() {
+            const { courseId, courseworkId } = getFormValues();
+            if (!validateRequired(courseId, courseworkId)) return;
+
+            try {
+                const response = await fetch(`/api/submissions/debug-classroom/${courseId}/${courseworkId}`);
+                const data = await response.json();
+                displayResult(data, !response.ok);
+            } catch (error) {
+                displayResult({ error: error.message }, true);
+            }
+        }
+
+        // Investigate Assignment
+        async function investigateAssignment() {
+            const { courseworkId } = getFormValues();
+            if (!courseworkId) {
+                alert('Please enter Coursework ID');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/submissions/investigate/${courseworkId}`);
+                const data = await response.json();
+                displayResult(data, !response.ok);
+            } catch (error) {
+                displayResult({ error: error.message }, true);
+            }
+        }
+
+        // Load Submissions
+        async function loadSubmissions() {
+            const { courseId, courseworkId } = getFormValues();
+            if (!validateRequired(courseId, courseworkId)) return;
+
+            try {
+                const response = await fetch(`/api/submissions/load/${courseId}/${courseworkId}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                displayResult(data, !response.ok);
+            } catch (error) {
+                displayResult({ error: error.message }, true);
+            }
+        }
+
+        // Trigger OCR Processing
+        async function triggerOCR() {
+            const { courseId, courseworkId } = getFormValues();
+            if (!validateRequired(courseId, courseworkId)) return;
+
+            try {
+                const response = await fetch(`/api/submissions/trigger-ocr/${courseId}/${courseworkId}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                displayResult(data, !response.ok);
+            } catch (error) {
+                displayResult({ error: error.message }, true);
+            }
+        }
+
+        // Check Submission Status
+        async function checkSubmissionStatus() {
+            const { courseworkId } = getFormValues();
+            if (!courseworkId) {
+                alert('Please enter Coursework ID');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/submissions/status/${courseworkId}`);
+                const data = await response.json();
+                displayResult(data, !response.ok);
+            } catch (error) {
+                displayResult({ error: error.message }, true);
+            }
+        }
+
+        // Get Submission Summary
+        async function getSubmissionSummary() {
+            const { courseId, courseworkId } = getFormValues();
+            if (!validateRequired(courseId, courseworkId)) return;
+
+            try {
+                const response = await fetch(`/api/submissions/summary/${courseId}/${courseworkId}`);
+                const data = await response.json();
+                displayResult(data, !response.ok);
+            } catch (error) {
+                displayResult({ error: error.message }, true);
+            }
+        }
+
+        // Evaluate New Submissions
+        async function evaluateNewSubmissions() {
+            const { courseId, courseworkId, gradingVersion } = getFormValues();
+            if (!validateRequired(courseId, courseworkId)) return;
+
+            const formData = new FormData();
+            formData.append('grading_version', gradingVersion);
+            
+            const answerKeyFile = document.getElementById('answerKey').files[0];
+            if (answerKeyFile) {
+                formData.append('answer_key', answerKeyFile);
+            }
+
+            try {
+                const response = await fetch(`/api/submissions/evaluate-new/${courseId}/${courseworkId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                displayResult(data, !response.ok);
+            } catch (error) {
+                displayResult({ error: error.message }, true);
+            }
+        }
+
+        // Evaluate All Submissions (placeholder - would need full evaluation endpoint)
+        async function evaluateAllSubmissions() {
+            alert('Full evaluation endpoint not implemented in this demo. Use "Evaluate New Submissions" instead.');
+        }
+
+        // Evaluate Single Submission
+        async function evaluateSingleSubmission() {
+            const { courseId, courseworkId, studentId, gradingVersion } = getFormValues();
+            if (!validateRequired(courseId, courseworkId)) return;
+            if (!studentId) {
+                alert('Please enter Student Google ID');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('grading_version', gradingVersion);
+            
+            const answerKeyFile = document.getElementById('answerKey').files[0];
+            if (answerKeyFile) {
+                formData.append('answer_key', answerKeyFile);
+            }
+
+            try {
+                const response = await fetch(`/api/submissions/evaluate-single/${courseId}/${courseworkId}/${studentId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                displayResult(data, !response.ok);
+            } catch (error) {
+                displayResult({ error: error.message }, true);
+            }
+        }
+
+        // Auto-fill sample data for testing
+        function fillSampleData() {
+            // These would be filled with actual IDs for testing
+            // document.getElementById('courseId').value = 'YOUR_COURSE_ID';
+            // document.getElementById('courseworkId').value = 'YOUR_COURSEWORK_ID';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Universal AI Studio Test Tool loaded');
+            // Uncomment the line below to auto-fill sample data
+            // fillSampleData();
+        });
+    </script>
+</body>
+</html>

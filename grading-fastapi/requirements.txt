@@ -1,0 +1,10 @@
+mord>=0.7
+ollama>=0.5.1
+pandas>=2.3.0
+scikit-learn>=1.7.0
+transformers[torch]>=4.52.4
+xgboost>=3.0.2
+fastapi
+uvicorn
+aiofiles
+python-multipart

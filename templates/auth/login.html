@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teacher Login - AI Grading Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/theme.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row vh-100 justify-content-center align-items-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <a href="/" class="d-flex justify-content-center align-items-center text-decoration-none text-dark mb-3">
+                                <i class="fas fa-graduation-cap fs-2 text-primary me-2"></i>
+                                <h2 class="fw-bold mb-0">AI Grading Platform</h2>
+                            </a>
+                            <h4 class="text-muted">Teacher Access</h4>
+                            <p class="text-muted small">Sign in with your Google account to continue</p>
+                        </div>
+                        
+                        <div id="alert-container"></div>
+
+                        <div class="d-grid">
+                            <button id="googleSignInBtn" class="btn btn-primary btn-lg">
+                                <i class="fab fa-google me-2"></i> Sign in with Google
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <small class="text-muted">
+                                By signing in, you agree to our terms of service and privacy policy.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { api } from '/static/js/api.js';
+
+        const googleBtn = document.getElementById('googleSignInBtn');
+
+        // Handle Google Sign-In
+        googleBtn.addEventListener('click', async () => {
+            try {
+                // Use regular login flow (no forced consent)
+                const { auth_url } = await api.getGoogleAuthUrl(false);
+                if (auth_url) {
+                    window.location.href = auth_url;
+                } else {
+                    showAlert('Could not initiate Google Sign-In. Please try again later.', 'warning');
+                }
+            } catch (error) {
+                 showAlert(error.message || 'An error occurred with Google Sign-In.', 'danger');
+            }
+        });
+
+        function showAlert(message, type = 'danger') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            if (error) {
+                message = "Sign-in with Google failed. Please try again.";
+            }
+        
+            const alertContainer = document.getElementById('alert-container');
+            alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+
+        // On page load, check for active session first, then check for URL errors.
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check if user is already logged in by pinging a protected route
+            try {
+                const response = await fetch('/api/users/me');
+                if (response.ok) {
+                    // If the response is OK, the user has a valid session.
+                    // Redirect to the main application page (which leads to evaluation).
+                    window.location.href = '/evaluation.html'; 
+                    return; // Stop script execution to prevent showing alerts on this page
+                }
+                // If not OK (e.g., 401 Unauthorized), do nothing and let the login page render.
+            } catch (error) {
+                // This would typically be a network error, not a 401.
+                // It's safe to just let the login page render.
+                console.warn('Auth check failed (network error):', error);
+            }
+
+            // Original logic: Check for a login error in the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('error')) {
+                showAlert('Sign-in with Google failed. Please try again.', 'danger');
+            }
+        });
+    </script>
+</body>
+</html>

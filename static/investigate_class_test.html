@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Investigation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; text-align: center; }
+        .assignment-card {
+            background-color: #f9f9f9;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        .info-section {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .submission-item {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .status {
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 3px;
+            color: white;
+            font-size: 12px;
+        }
+        .status.PENDING { background-color: #9C27B0; }
+        .status.DOWNLOADED { background-color: #00BCD4; }
+        .status.OCR_COMPLETE { background-color: #8BC34A; }
+        .status.GRADED { background-color: #4CAF50; }
+        .status.TURNED_IN { background-color: #4CAF50; }
+        .status.CREATED { background-color: #FF9800; }
+        .error { color: #f44336; font-weight: bold; }
+        .success { color: #4CAF50; font-weight: bold; }
+        .warning { color: #FF9800; font-weight: bold; }
+        .debug-link {
+            background-color: #2196F3;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px;
+            display: inline-block;
+        }
+        .debug-link:hover { background-color: #0b7dda; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Assignment Investigation: "class-test"</h1>
+        <div id="results">Loading...</div>
+    </div>
+
+    <script>
+        async function loadInvestigation() {
+            try {
+                const response = await fetch('/api/submissions/investigate/class-test', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResults(data);
+                } else {
+                    const error = await response.text();
+                    document.getElementById('results').innerHTML = `
+                        <div class="error">Error: ${error}</div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <div class="error">Network Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        function displayResults(data) {
+            let html = `
+                <div class="info-section">
+                    <h3>📊 Search Results</h3>
+                    <p><strong>Search Term:</strong> "${data.search_term}"</p>
+                    <p><strong>Assignments Found:</strong> ${data.assignments_found}</p>
+                </div>
+            `;
+
+            if (data.assignments_found === 0) {
+                html += `
+                    <div class="info-section">
+                        <h3 class="error">❌ No assignments found with "class-test" in title</h3>
+                        <p>Here are all assignments in the database:</p>
+                `;
+                
+                if (data.all_assignments && data.all_assignments.length > 0) {
+                    data.all_assignments.forEach(assignment => {
+                        html += `
+                            <div class="submission-item">
+                                <strong>Title:</strong> "${assignment.title}"<br>
+                                <strong>Google ID:</strong> ${assignment.google_assignment_id}<br>
+                                <strong>Created:</strong> ${assignment.created_at}
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<p class="error">No assignments found in database at all!</p>';
+                }
+                
+                html += '</div>';
+            } else {
+                data.assignments.forEach(assignment => {
+                    html += `
+                        <div class="assignment-card">
+                            <h3>📋 ${assignment.title}</h3>
+                            
+                            <div class="info-section">
+                                <h4>Basic Information</h4>
+                                <p><strong>Google Assignment ID:</strong> ${assignment.google_assignment_id}</p>
+                                <p><strong>Database ID:</strong> ${assignment.database_id}</p>
+                                <p><strong>Created:</strong> ${assignment.created_at}</p>
+                            </div>
+
+                            <div class="info-section">
+                                <h4>Course Information</h4>
+                    `;
+                    
+                    if (assignment.course) {
+                        html += `
+                            <p><strong>Course Name:</strong> ${assignment.course.name}</p>
+                            <p><strong>Google Course ID:</strong> ${assignment.course.google_course_id}</p>
+                        `;
+                    } else {
+                        html += '<p class="error">❌ No course information found</p>';
+                    }
+                    
+                    html += '</div>';
+
+                    html += `
+                            <div class="info-section">
+                                <h4>Exam Information</h4>
+                    `;
+                    
+                    if (assignment.exam) {
+                        html += `
+                            <p><strong>Exam Title:</strong> ${assignment.exam.title}</p>
+                            <p><strong>Exam ID:</strong> ${assignment.exam.id}</p>
+                        `;
+                    } else {
+                        html += '<p class="warning">⚠️ No exam found for this assignment</p>';
+                    }
+                    
+                    html += '</div>';
+
+                    html += `
+                            <div class="info-section">
+                                <h4>Submissions (${assignment.submissions_count} total)</h4>
+                    `;
+                    
+                    if (assignment.submissions.length > 0) {
+                        assignment.submissions.forEach(sub => {
+                            html += `
+                                <div class="submission-item">
+                                    <strong>Student:</strong> ${sub.student_name} (${sub.student_google_id})<br>
+                                    <strong>Status:</strong> <span class="status ${sub.status}">${sub.status}</span><br>
+                                    <strong>Google Submission ID:</strong> ${sub.google_submission_id}<br>
+                                    <strong>Local File:</strong> ${sub.local_file_path || 'Not downloaded'}<br>
+                                    <strong>Google Drive ID:</strong> ${sub.google_drive_id || 'None'}<br>
+                                    <strong>Created:</strong> ${sub.created_at}
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html += '<p class="error">❌ No submissions found in database</p>';
+                    }
+                    
+                    html += '</div>';
+
+                    html += `
+                            <div class="info-section">
+                                <h4>File System</h4>
+                                <p><strong>Directory:</strong> ${assignment.file_system.directory_path}</p>
+                                <p><strong>Exists:</strong> ${assignment.file_system.directory_exists ? '✅ Yes' : '❌ No'}</p>
+                    `;
+                    
+                    if (assignment.file_system.contents.length > 0) {
+                        html += '<p><strong>Contents:</strong></p>';
+                        assignment.file_system.contents.forEach(item => {
+                            if (item.type === 'file') {
+                                html += `<div class="submission-item">📄 ${item.name} (${item.size} bytes)</div>`;
+                            } else {
+                                html += `<div class="submission-item">📁 ${item.name}/ (${item.items_count} items)</div>`;
+                                if (item.items) {
+                                    item.items.forEach(subItem => {
+                                        html += `<div style="margin-left: 20px;">- ${subItem}</div>`;
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        html += '<p>No files found</p>';
+                    }
+                    
+                    html += '</div>';
+
+                    html += `
+                            <div class="info-section">
+                                <h4>Debug Tools</h4>
+                                <a href="${assignment.debug_urls.google_classroom_debug}" class="debug-link" target="_blank">
+                                    🔍 Debug Google Classroom API
+                                </a>
+                                <a href="${assignment.debug_urls.database_debug}" class="debug-link" target="_blank">
+                                    🗄️ Debug Database
+                                </a>
+                                <br><br>
+                                <p><strong>For manual debugging:</strong></p>
+                                <p>Course ID: <code>${assignment.course ? assignment.course.google_course_id : 'UNKNOWN'}</code></p>
+                                <p>Coursework ID: <code>${assignment.google_assignment_id}</code></p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Load investigation when page loads
+        loadInvestigation();
+    </script>
+</body>
+</html>

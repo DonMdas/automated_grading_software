@@ -1,0 +1,22 @@
+Features used: tf_idf_similarity, full_similarity_score, mean_similarity_score
+
+Model: GaussianNB
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0     0.2500    0.2500    0.2500        20
+           1     0.2500    0.0500    0.0833        20
+           2     0.3448    0.5000    0.4082        20
+           3     0.1875    0.1429    0.1622        21
+           4     0.1852    0.2500    0.2128        20
+           5     0.2400    0.3000    0.2667        20
+           6     0.3158    0.2857    0.3000        21
+           7     0.4118    0.3333    0.3684        21
+           8     0.3529    0.3000    0.3243        20
+           9     0.4828    0.7000    0.5714        20
+          10     1.0000    1.0000    1.0000        20
+
+    accuracy                         0.3722       223
+   macro avg     0.3655    0.3738    0.3588       223
+weighted avg     0.3647    0.3722    0.3577       223

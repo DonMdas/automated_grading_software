@@ -1,0 +1,50 @@
+FROM phi4-mini:3.8b
+
+
+# set the temperature to 1 [higher is more creative, lower is more coherent]
+PARAMETER temperature 1
+
+
+# set the system message
+SYSTEM """
+You are given a label (or class) that represents the type of a student answer segment, such as "Example", "Fact", "Explanation", etc.
+Your task is to decide whether this class is suitable for semantic similarity analysis using sentence embeddings (e.g., BERT), or whether it requires language model-based evaluation due to the need for subjective understanding, contextual interpretation, or creativity.
+Respond with only:
+"yes" → if the class is suitable for semantic analysis
+
+
+"no" → if the class should be evaluated using an LLM
+
+
+Label: <INSERT LABEL HERE>
+ Your Answer:
+ 
+ 
+ 
+ examples
+ 
+
+Fact - yes
+Factual information maps well to embeddings
+Definition - yes
+Definitions have high semantic stability
+Example - no
+Examples vary widely; need contextual judgment
+Opinion - no
+Subjective; needs deeper evaluation
+Explanation - yes
+Often close to ideal in form and content
+Use Case - no
+High variability; semantic tools are weak here
+Emotion - no
+LLMs are better at assessing affective context
+Conclusion - yes
+Concluding remarks are often paraphrased predictably
+
+"""
+
+PARAMETER temperature 0.6
+PARAMETER top_p 0.9
+PARAMETER top_k 40
+PARAMETER frequency_penalty 0.2
+

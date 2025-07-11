@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analytics Center - AI Grading Platform</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom Theme -->
+    <link href="/static/css/theme.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="/static/css/analytics.css" rel="stylesheet">
+    
+    <style>
+        /* Analytics workflow styles */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            opacity: 1;
+        }
+        
+        .step.completed {
+            opacity: 1;
+            color: var(--bs-success);
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-number {
+            background: var(--bs-primary);
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background: var(--bs-success);
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50px;
+            width: 40px;
+            height: 2px;
+            background: #e9ecef;
+            z-index: -1;
+        }
+        
+        .step.completed:not(:last-child)::after {
+            background: var(--bs-success);
+        }
+        
+        .step-content {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .platform-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e9ecef;
+        }
+        
+        .platform-card:hover {
+            border-color: var(--bs-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .platform-card.connected {
+            border-color: var(--bs-success);
+            background-color: #f8fff8;
+        }
+        
+        .course-card, .exam-card, .student-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .course-card:hover, .exam-card:hover, .student-card:hover {
+            border-color: var(--bs-primary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .course-card.selected, .exam-card.selected, .student-card.selected {
+            border-color: var(--bs-primary);
+            background-color: #f8f9ff;
+        }
+        
+        .metric-card {
+            border-left: 4px solid var(--bs-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .step-indicator {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .step-label {
+                font-size: 0.75rem;
+            }
+            
+            .step-number {
+                width: 30px;
+                height: 30px;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body class="fade-in">
+    <!-- Modern Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top" style="padding: 0.15rem 0; background: rgba(255, 255, 255, 0.98) !important; backdrop-filter: blur(10px); box-shadow: 0 1px 10px rgba(0,0,0,0.1); min-height: 50px;">
+        <div class="container-fluid px-5" style="display: flex; align-items: center;">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="/" style="margin: 0; margin-right: auto; flex-shrink: 0; padding-left: 0;">
+                <i class="fas fa-graduation-cap me-2 text-primary" style="font-size: 1.5rem;"></i>
+                <span class="fw-bold" style="font-size: 1.1rem; color: var(--primary-blue); white-space: nowrap;">AI Grading Platform</span>
+            </a>
+            
+            <!-- Center navigation -->
+            <ul class="navbar-nav d-none d-lg-flex mx-auto" style="gap: 1.2rem; flex-shrink: 0;">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/evaluation" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-clipboard-check me-1"></i>Start Evaluating
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active fw-semibold" href="/analytics" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-chart-line me-1"></i>Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/pricing.html" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-tags me-1"></i>Pricing
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Right side auth buttons -->
+            <div class="d-none d-lg-flex align-items-center gap-2 auth-buttons" style="flex-shrink: 0;">
+                <button class="btn btn-outline-primary fw-semibold hover-lift" data-bs-toggle="tooltip" title="Create Teacher Account" style="padding: 0.35rem 0.9rem; border-radius: 5px; white-space: nowrap; font-size: 0.85rem;">
+                    <i class="fas fa-user-plus me-1"></i>
+                    Create Account
+                </button>
+                <button class="btn btn-primary fw-semibold hover-lift" data-bs-toggle="tooltip" title="Sign in as Teacher" style="padding: 0.35rem 0.9rem; border-radius: 5px; white-space: nowrap; font-size: 0.85rem;">
+                    <i class="fas fa-chalkboard-teacher me-1"></i>
+                    Teacher Sign In
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4" style="padding-top: 90px !important;">
+        <!-- Step Indicator -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="fw-bold mb-0">
+                                <i class="fas fa-chart-line me-2 text-primary"></i>
+                                AI Analytics Center
+                            </h2>
+                            <div class="d-flex align-items-center">
+                                <div class="step-indicator">
+                                    <div class="step active" id="step1">
+                                        <span class="step-number">1</span>
+                                        <span class="step-label">Connect</span>
+                                    </div>
+                                    <div class="step" id="step2">
+                                        <span class="step-number">2</span>
+                                        <span class="step-label">Course</span>
+                                    </div>
+                                    <div class="step" id="step3">
+                                        <span class="step-number">3</span>
+                                        <span class="step-label">Exam</span>
+                                    </div>
+                                    <div class="step" id="step4">
+                                        <span class="step-number">4</span>
+                                        <span class="step-label">Analytics</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Platform Connection -->
+        <div id="step1-content" class="step-content active">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-link me-2"></i>
+                                Connect to Learning Management System
+                            </h4>
+                        </div>
+                        <div class="card-body p-5">
+                            <p class="text-muted mb-4">Connect to your learning management system to view comprehensive analytics of your AI grading performance.</p>
+                            
+                            <div class="row justify-content-center g-4">
+                                <div class="col-md-6 col-lg-5">
+                                    <div class="card platform-card h-100" id="googleAnalyticsCard" style="cursor: pointer; transition: transform 0.2s ease; border: 2px solid #e9ecef;">
+                                        <div class="card-body text-center p-4 d-flex flex-column">
+                                            <i class="fab fa-google text-danger mb-3" style="font-size: 3.5rem;"></i>
+                                            <h5 class="fw-bold mb-3">Google Classroom</h5>
+                                            <p class="text-muted mb-3 flex-grow-1">Connect to view comprehensive analytics from Google Classroom assignments and student performance data</p>
+                                            <div class="connection-status" id="googleAnalyticsStatus">
+                                                <span class="badge bg-secondary px-3 py-2">Not Connected</span>
+                                            </div>
+                                            <button class="btn btn-outline-danger mt-3" onclick="connectGoogleClassroomAnalytics()">
+                                                <i class="fab fa-google me-2"></i>Connect Now
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button class="btn btn-primary" id="continueToStep2" onclick="goToStep(2)" disabled>
+                                    Continue to Course Analytics <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Course Selection & Analytics -->
+        <div id="step2-content" class="step-content" style="display: none;">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-success text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-book me-2"></i>
+                                Course Analytics
+                            </h4>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Connected Platform Info -->
+                            <div class="alert alert-success" id="connectedPlatformAnalyticsInfo">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Connected to <span id="connectedPlatformAnalyticsName">Google Classroom</span>
+                            </div>
+
+                            <!-- Course Selection -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Search courses..." id="courseSearch">
+                                        <button class="btn btn-outline-secondary" type="button">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Courses List -->
+                            <div id="coursesList">
+                                <div class="course-item">
+                                    <div class="card mb-3 course-card">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-8">
+                                                    <h6 class="fw-bold mb-1">Mathematics - Calculus I</h6>
+                                                    <p class="text-muted mb-2">
+                                                        <i class="fas fa-users me-1"></i>45 students |
+                                                        <i class="fas fa-file-alt me-1"></i>12 exams |
+                                                        <i class="fas fa-calendar me-1"></i>Fall 2024
+                                                    </p>
+                                                    <span class="badge bg-primary me-2">Mathematics</span>
+                                                    <span class="badge bg-success">Active</span>
+                                                </div>
+                                                <div class="col-md-4 text-end">
+                                                    <div class="mb-2">
+                                                        <strong>AI Accuracy:</strong> <span class="text-success">94.5%</span>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <strong>Papers Graded:</strong> 540
+                                                    </div>
+                                                    <div class="progress" style="height: 6px;">
+                                                        <div class="progress-bar bg-success" style="width: 94.5%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="course-item">
+                                    <div class="card mb-3 course-card">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-8">
+                                                    <h6 class="fw-bold mb-1">Biology - Molecular Biology</h6>
+                                                    <p class="text-muted mb-2">
+                                                        <i class="fas fa-users me-1"></i>38 students |
+                                                        <i class="fas fa-file-alt me-1"></i>8 exams |
+                                                        <i class="fas fa-calendar me-1"></i>Fall 2024
+                                                    </p>
+                                                    <span class="badge bg-info me-2">Science</span>
+                                                    <span class="badge bg-success">Active</span>
+                                                </div>
+                                                <div class="col-md-4 text-end">
+                                                    <div class="mb-2">
+                                                        <strong>AI Accuracy:</strong> <span class="text-success">91.8%</span>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <strong>Papers Graded:</strong> 304
+                                                    </div>
+                                                    <div class="progress" style="height: 6px;">
+                                                        <div class="progress-bar bg-info" style="width: 91.8%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="course-item">
+                                    <div class="card mb-3 course-card">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-8">
+                                                    <h6 class="fw-bold mb-1">History - World History</h6>
+                                                    <p class="text-muted mb-2">
+                                                        <i class="fas fa-users me-1"></i>52 students |
+                                                        <i class="fas fa-file-alt me-1"></i>6 exams |
+                                                        <i class="fas fa-calendar me-1"></i>Fall 2024
+                                                    </p>
+                                                    <span class="badge bg-warning me-2">History</span>
+                                                    <span class="badge bg-success">Active</span>
+                                                </div>
+                                                <div class="col-md-4 text-end">
+                                                    <div class="mb-2">
+                                                        <strong>AI Accuracy:</strong> <span class="text-success">89.2%</span>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <strong>Papers Graded:</strong> 312
+                                                    </div>
+                                                    <div class="progress" style="height: 6px;">
+                                                        <div class="progress-bar bg-warning" style="width: 89.2%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-secondary me-2">
+                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                </button>
+                                <button class="btn btn-primary" id="continueToStep3" disabled>
+                                    View Exam Analytics <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Exam Selection & Analytics -->
+        <div id="step3-content" class="step-content" style="display: none;">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-info text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-file-alt me-2"></i>
+                                Exam Analytics
+                            </h4>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Selected Course Info -->
+                            <div class="alert alert-info" id="selectedCourseInfo">
+                                <h6 class="fw-bold mb-2">Selected Course:</h6>
+                                <div id="selectedCourseDetails">Mathematics - Calculus I</div>
+                            </div>
+
+                            <!-- Exam List -->
+                            <div id="examAnalyticsList">
+                                <div class="exam-item">
+                                    <div class="card mb-3 exam-card">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-6">
+                                                    <h6 class="fw-bold mb-1">Midterm Exam - Derivatives</h6>
+                                                    <p class="text-muted mb-2">
+                                                        <i class="fas fa-calendar me-1"></i>Nov 15, 2024 |
+                                                        <i class="fas fa-users me-1"></i>45 students |
+                                                        <i class="fas fa-clock me-1"></i>90 minutes
+                                                    </p>
+                                                    <span class="badge bg-primary me-2">Midterm</span>
+                                                    <span class="badge bg-success">Completed</span>
+                                                </div>
+                                                <div class="col-md-3 text-center">
+                                                    <div class="mb-1">
+                                                        <strong>AI Accuracy</strong>
+                                                    </div>
+                                                    <div class="h4 text-success">96.2%</div>
+                                                </div>
+                                                <div class="col-md-3 text-center">
+                                                    <div class="mb-1">
+                                                        <strong>Avg Score</strong>
+                                                    </div>
+                                                    <div class="h4 text-primary">78.5</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="exam-item">
+                                    <div class="card mb-3 exam-card">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-6">
+                                                    <h6 class="fw-bold mb-1">Quiz 3 - Integration Basics</h6>
+                                                    <p class="text-muted mb-2">
+                                                        <i class="fas fa-calendar me-1"></i>Dec 1, 2024 |
+                                                        <i class="fas fa-users me-1"></i>43 students |
+                                                        <i class="fas fa-clock me-1"></i>30 minutes
+                                                    </p>
+                                                    <span class="badge bg-info me-2">Quiz</span>
+                                                    <span class="badge bg-success">Completed</span>
+                                                </div>
+                                                <div class="col-md-3 text-center">
+                                                    <div class="mb-1">
+                                                        <strong>AI Accuracy</strong>
+                                                    </div>
+                                                    <div class="h4 text-success">93.7%</div>
+                                                </div>
+                                                <div class="col-md-3 text-center">
+                                                    <div class="mb-1">
+                                                        <strong>Avg Score</strong>
+                                                    </div>
+                                                    <div class="h4 text-primary">82.3</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="exam-item">
+                                    <div class="card mb-3 exam-card">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-6">
+                                                    <h6 class="fw-bold mb-1">Final Exam - Comprehensive</h6>
+                                                    <p class="text-muted mb-2">
+                                                        <i class="fas fa-calendar me-1"></i>Dec 15, 2024 |
+                                                        <i class="fas fa-users me-1"></i>44 students |
+                                                        <i class="fas fa-clock me-1"></i>120 minutes
+                                                    </p>
+                                                    <span class="badge bg-danger me-2">Final</span>
+                                                    <span class="badge bg-warning">In Progress</span>
+                                                </div>
+                                                <div class="col-md-3 text-center">
+                                                    <div class="mb-1">
+                                                        <strong>AI Accuracy</strong>
+                                                    </div>
+                                                    <div class="h4 text-success">94.8%</div>
+                                                </div>
+                                                <div class="col-md-3 text-center">
+                                                    <div class="mb-1">
+                                                        <strong>Avg Score</strong>
+                                                    </div>
+                                                    <div class="h4 text-primary">75.2</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-secondary me-2">
+                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                </button>
+                                <button class="btn btn-primary" id="continueToStep4" disabled>
+                                    View Detailed Analytics <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Detailed Analytics Dashboard -->
+        <div id="step4-content" class="step-content" style="display: none;">
+            <div class="row">
+                <!-- Sidebar with Navigation -->
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Analytics Views
+                            </h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                <a href="#" class="list-group-item list-group-item-action active">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Overview
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-users me-2"></i>Student Performance
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-question-circle me-2"></i>Question Analysis
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-brain me-2"></i>AI Performance
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-trending-up me-2"></i>Trends
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Options -->
+                    <div class="card border-0 shadow-sm mt-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Export Data</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-file-excel me-2"></i>Excel
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-file-pdf me-2"></i>PDF Report
+                                </button>
+                                <button class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-file-csv me-2"></i>CSV Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Analytics Area -->
+                <div class="col-md-9">
+                    <!-- Overview Analytics -->
+                    <div id="overview-view" class="analytics-view">
+                        <div class="card border-0 shadow-lg">
+                            <div class="card-header bg-primary text-white">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-chart-line me-2"></i>
+                                            <span id="currentExamTitle">Midterm Exam - Derivatives</span> Analytics
+                                        </h5>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="btn-group">
+                                            <button class="btn btn-light btn-sm">
+                                                <i class="fas fa-sync-alt"></i> Refresh
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- Key Metrics -->
+                                <div class="row mb-4">
+                                    <div class="col-lg-3 col-md-6 mb-3">
+                                        <div class="card metric-card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="fas fa-users fa-2x text-primary"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <div class="small text-muted">Total Students</div>
+                                                        <div class="h4 fw-bold">45</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 mb-3">
+                                        <div class="card metric-card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="fas fa-bullseye fa-2x text-success"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <div class="small text-muted">AI Accuracy</div>
+                                                        <div class="h4 fw-bold text-success">96.2%</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 mb-3">
+                                        <div class="card metric-card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="fas fa-chart-bar fa-2x text-info"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <div class="small text-muted">Avg Score</div>
+                                                        <div class="h4 fw-bold text-info">78.5</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 mb-3">
+                                        <div class="card metric-card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="fas fa-clock fa-2x text-warning"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <div class="small text-muted">Avg Time</div>
+                                                        <div class="h4 fw-bold text-warning">2.3m</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Charts Section -->
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Score Distribution</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="scoreDistributionChart" height="300"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">AI Confidence</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="aiConfidenceChart" height="300"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Performance View -->
+                    <div id="students-view" class="analytics-view" style="display: none;">
+                        <div class="card border-0 shadow-lg">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-users me-2"></i>
+                                    Student Performance Analytics
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Student List with Performance -->
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Student</th>
+                                                <th>Score</th>
+                                                <th>AI Accuracy</th>
+                                                <th>Time Taken</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="studentsPerformanceTable">
+                                            <!-- Students will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question Analysis View -->
+                    <div id="questions-view" class="analytics-view" style="display: none;">
+                        <div class="card border-0 shadow-lg">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-question-circle me-2"></i>
+                                    Question-wise Analysis
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Question performance stats -->
+                                <div id="questionAnalysis">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-2">
+                                                    <h6 class="fw-bold">Question 1</h6>
+                                                    <span class="badge bg-success">Easy</span>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="text-center">
+                                                        <div class="h5 mb-0">93%</div>
+                                                        <small class="text-muted">Correct Rate</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="text-center">
+                                                        <div class="h6 mb-0">42/45</div>
+                                                        <small class="text-muted">Students</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="text-center">
+                                                        <div class="h6 mb-0">1.2m</div>
+                                                        <small class="text-muted">Avg Time</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="progress" style="height: 8px;">
+                                                        <div class="progress-bar bg-success" style="width: 93%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-2">
+                                                    <h6 class="fw-bold">Question 2</h6>
+                                                    <span class="badge bg-warning">Medium</span>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="text-center">
+                                                        <div class="h5 mb-0">84%</div>
+                                                        <small class="text-muted">Correct Rate</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="text-center">
+                                                        <div class="h6 mb-0">38/45</div>
+                                                        <small class="text-muted">Students</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="text-center">
+                                                        <div class="h6 mb-0">2.1m</div>
+                                                        <small class="text-muted">Avg Time</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="progress" style="height: 8px;">
+                                                        <div class="progress-bar bg-warning" style="width: 84%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-2">
+                                                    <h6 class="fw-bold">Question 3</h6>
+                                                    <span class="badge bg-danger">Hard</span>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="text-center">
+                                                        <div class="h5 mb-0">69%</div>
+                                                        <small class="text-muted">Correct Rate</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="text-center">
+                                                        <div class="h6 mb-0">31/45</div>
+                                                        <small class="text-muted">Students</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="text-center">
+                                                        <div class="h6 mb-0">3.5m</div>
+                                                        <small class="text-muted">Avg Time</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="progress" style="height: 8px;">
+                                                        <div class="progress-bar bg-danger" style="width: 69%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Performance View -->
+                    <div id="ai-view" class="analytics-view" style="display: none;">
+                        <div class="card border-0 shadow-lg">
+                            <div class="card-header bg-purple text-white" style="background-color: #6f42c1 !important;">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-brain me-2"></i>
+                                    AI Grading Performance
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- AI performance metrics -->
+                                <div id="aiPerformanceMetrics">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card metric-card mb-3">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">Overall AI Accuracy</h6>
+                                                    <div class="h3 text-success">96.2%</div>
+                                                    <div class="progress mb-2" style="height: 8px;">
+                                                        <div class="progress-bar bg-success" style="width: 96.2%"></div>
+                                                    </div>
+                                                    <small class="text-muted">+2.1% from last exam</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card metric-card mb-3">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">Average Confidence</h6>
+                                                    <div class="h3 text-info">93.8%</div>
+                                                    <div class="progress mb-2" style="height: 8px;">
+                                                        <div class="progress-bar bg-info" style="width: 93.8%"></div>
+                                                    </div>
+                                                    <small class="text-muted">High confidence grading</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card metric-card mb-3">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">Processing Time</h6>
+                                                    <div class="h3 text-warning">2.3m</div>
+                                                    <div class="progress mb-2" style="height: 8px;">
+                                                        <div class="progress-bar bg-warning" style="width: 85%"></div>
+                                                    </div>
+                                                    <small class="text-muted">95% faster than manual</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card metric-card mb-3">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">Error Rate</h6>
+                                                    <div class="h3 text-danger">3.8%</div>
+                                                    <div class="progress mb-2" style="height: 8px;">
+                                                        <div class="progress-bar bg-danger" style="width: 3.8%"></div>
+                                                    </div>
+                                                    <small class="text-muted">Lower than industry average</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trends View -->
+                    <div id="trends-view" class="analytics-view" style="display: none;">
+                        <div class="card border-0 shadow-lg">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-trending-up me-2"></i>
+                                    Performance Trends
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Trend analysis -->
+                                <div id="trendAnalysis">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h6 class="mb-0">Performance Trends Over Time</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <canvas id="trendsChart" height="300"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-md-4">
+                                            <div class="card metric-card">
+                                                <div class="card-body text-center">
+                                                    <h6 class="card-title">Weekly Improvement</h6>
+                                                    <div class="h4 text-success">+2.1%</div>
+                                                    <small class="text-muted">AI Accuracy Growth</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card metric-card">
+                                                <div class="card-body text-center">
+                                                    <h6 class="card-title">Best Performance</h6>
+                                                    <div class="h4 text-primary">96.8%</div>
+                                                    <small class="text-muted">Peak Accuracy This Month</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card metric-card">
+                                                <div class="card-body text-center">
+                                                    <h6 class="card-title">Consistency Score</h6>
+                                                    <div class="h4 text-info">94.2%</div>
+                                                    <small class="text-muted">Performance Stability</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="text-center mt-4">
+                        <button class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Exams
+                        </button>
+                        <button class="btn btn-success">
+                            <i class="fas fa-file-download me-2"></i>Generate Full Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Google Classroom Connection Modal -->
+        <div class="modal fade" id="googleClassroomAnalyticsModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fab fa-google text-danger me-2"></i>
+                            Connect to Google Classroom for Analytics
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <i class="fab fa-google text-danger mb-3" style="font-size: 4rem;"></i>
+                            <h6>Sign in with your Google Account</h6>
+                            <p class="text-muted">Connect your Google Classroom to view comprehensive analytics.</p>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Analytics Access:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>View grading performance metrics</li>
+                                <li>Access student performance analytics</li>
+                                <li>Export detailed reports</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger">
+                            <i class="fab fa-google me-2"></i>Connect Google Classroom
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Modal -->
+        <div class="modal fade" id="processingAnalyticsModal" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body text-center p-5">
+                        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h5 id="processingAnalyticsTitle">Processing...</h5>
+                        <p class="text-muted mb-0" id="processingAnalyticsMessage">Please wait...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Classroom Analytics Connection Modal -->
+    <div class="modal fade" id="googleClassroomAnalyticsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fab fa-google text-danger me-2"></i>
+                        Connect to Google Classroom
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fab fa-google text-danger mb-3" style="font-size: 4rem;"></i>
+                        <h6>Sign in with your Google Account</h6>
+                        <p class="text-muted">Connect your Google Classroom to access detailed analytics and grade distributions.</p>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Analytics Access:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>View course and exam statistics</li>
+                            <li>Access student performance data</li>
+                            <li>Generate comprehensive reports</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger">
+                        <i class="fab fa-google me-2"></i>Connect Google Classroom
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Analytics Modal -->
+    <div class="modal fade" id="processingAnalyticsModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-5">
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 id="processingAnalyticsTitle">Processing...</h5>
+                    <p class="text-muted mb-0" id="processingAnalyticsMessage">Please wait while we fetch your analytics data.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/navigation.js"></script>
+    
+    <script>
+        // Analytics Workflow Management
+        class AnalyticsWorkflow {
+            constructor() {
+                this.currentStep = 1;
+                this.totalSteps = 4;
+                this.selectedPlatform = null;
+                this.selectedCourse = null;
+                this.selectedExam = null;
+                this.connectedPlatforms = new Set();
+                this.currentAnalyticsView = 'overview';
+                this.charts = {};
+                this.init();
+            }
+            
+            init() {
+                this.loadSampleData();
+                this.updateStepIndicator();
+                this.initializeCharts();
+            }
+            
+            loadSampleData() {
+                this.studentsData = [
+                    { id: 1, name: 'John Smith', score: 85, aiAccuracy: 94, timeTaken: '2.1m' },
+                    { id: 2, name: 'Sarah Johnson', score: 92, aiAccuracy: 96, timeTaken: '1.8m' },
+                    { id: 3, name: 'Mike Brown', score: 78, aiAccuracy: 87, timeTaken: '2.5m' },
+                    { id: 4, name: 'Emily Davis', score: 88, aiAccuracy: 91, timeTaken: '2.0m' },
+                    { id: 5, name: 'David Wilson', score: 95, aiAccuracy: 98, timeTaken: '1.9m' }
+                ];
+                this.loadStudentsTable();
+            }
+            
+            goToStep(step) {
+                if (step < 1 || step > this.totalSteps) return;
+                
+                const currentContent = document.getElementById(`step${this.currentStep}-content`);
+                if (currentContent) {
+                    currentContent.style.display = 'none';
+                    currentContent.classList.remove('active');
+                }
+                
+                const newContent = document.getElementById(`step${step}-content`);
+                if (newContent) {
+                    newContent.style.display = 'block';
+                    newContent.classList.add('active');
+                }
+                
+                this.currentStep = step;
+                this.updateStepIndicator();
+                
+                if (step === 4) {
+                    setTimeout(() => this.initializeCharts(), 100);
+                }
+            }
+            
+            updateStepIndicator() {
+                for (let i = 1; i <= this.totalSteps; i++) {
+                    const stepElement = document.getElementById(`step${i}`);
+                    if (stepElement) {
+                        stepElement.classList.remove('active', 'completed');
+                        if (i === this.currentStep) {
+                            stepElement.classList.add('active');
+                        } else if (i < this.currentStep) {
+                            stepElement.classList.add('completed');
+                        }
+                    }
+                }
+            }
+            
+            connectGoogleClassroomAnalytics() {
+                const modal = new bootstrap.Modal(document.getElementById('googleClassroomAnalyticsModal'));
+                modal.show();
+            }
+            
+            connectMoodleAnalytics() {
+                const modal = new bootstrap.Modal(document.getElementById('moodleAnalyticsModal'));
+                modal.show();
+            }
+            
+            authenticateGoogleClassroomAnalytics() {
+                this.showProcessing('Connecting to Google Classroom...', 'Fetching analytics data...');
+                
+                setTimeout(() => {
+                    this.hideProcessing();
+                    this.connectedPlatforms.add('google');
+                    this.selectedPlatform = 'google';
+                    this.updatePlatformStatus('google', true);
+                    
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('googleClassroomAnalyticsModal'));
+                    modal.hide();
+                    
+                    document.getElementById('continueToStep2').disabled = false;
+                    this.showAlert('Successfully connected to Google Classroom!', 'success');
+                }, 2000);
+            }
+            
+            authenticateMoodleAnalytics() {
+                const url = document.getElementById('moodleAnalyticsUrl').value;
+                const username = document.getElementById('moodleAnalyticsUsername').value;
+                const password = document.getElementById('moodleAnalyticsPassword').value;
+                
+                if (!url || !username || !password) {
+                    this.showAlert('Please fill in all required fields', 'warning');
+                    return;
+                }
+                
+                this.showProcessing('Connecting to Moodle...', 'Verifying credentials...');
+                
+                setTimeout(() => {
+                    this.hideProcessing();
+                    this.connectedPlatforms.add('moodle');
+                    this.selectedPlatform = 'moodle';
+                    this.updatePlatformStatus('moodle', true);
+                    
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('moodleAnalyticsModal'));
+                    modal.hide();
+                    
+                    document.getElementById('continueToStep2').disabled = false;
+                    this.showAlert('Successfully connected to Moodle!', 'success');
+                }, 2500);
+            }
+            
+            updatePlatformStatus(platform, connected) {
+                const statusId = platform === 'google' ? 'googleAnalyticsStatus' : 'moodleAnalyticsStatus';
+                const cardId = platform === 'google' ? 'googleAnalyticsCard' : 'moodleAnalyticsCard';
+                
+                const statusElement = document.getElementById(statusId);
+                const cardElement = document.getElementById(cardId);
+                
+                if (statusElement && cardElement) {
+                    if (connected) {
+                        statusElement.innerHTML = '<span class="badge bg-success">Connected</span>';
+                        cardElement.classList.add('connected');
+                    } else {
+                        statusElement.innerHTML = '<span class="badge bg-secondary">Not Connected</span>';
+                        cardElement.classList.remove('connected');
+                    }
+                }
+                
+                if (connected) {
+                    const platformName = platform === 'google' ? 'Google Classroom' : 'Moodle';
+                    const infoElement = document.getElementById('connectedPlatformAnalyticsName');
+                    if (infoElement) {
+                        infoElement.textContent = platformName;
+                    }
+                }
+            }
+            
+            selectCourse(courseId) {
+                document.querySelectorAll('.course-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                const courseCard = document.querySelector(`[onclick="selectCourse('${courseId}')"] .course-card`);
+                if (courseCard) {
+                    courseCard.classList.add('selected');
+                }
+                
+                this.selectedCourse = courseId;
+                document.getElementById('continueToStep3').disabled = false;
+                
+                const courseDetails = this.getCourseDetails(courseId);
+                const detailsElement = document.getElementById('selectedCourseDetails');
+                if (detailsElement) {
+                    detailsElement.textContent = courseDetails.title;
+                }
+            }
+            
+            getCourseDetails(courseId) {
+                const courses = {
+                    'course1': { title: 'Mathematics - Calculus I' },
+                    'course2': { title: 'Biology - Molecular Biology' },
+                    'course3': { title: 'History - World History' }
+                };
+                return courses[courseId] || { title: 'Unknown Course' };
+            }
+            
+            selectExamAnalytics(examId) {
+                document.querySelectorAll('.exam-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                const examCard = document.querySelector(`[onclick="selectExamAnalytics('${examId}')"] .exam-card`);
+                if (examCard) {
+                    examCard.classList.add('selected');
+                }
+                
+                this.selectedExam = examId;
+                document.getElementById('continueToStep4').disabled = false;
+                
+                const examDetails = this.getExamDetails(examId);
+                const titleElement = document.getElementById('currentExamTitle');
+                if (titleElement) {
+                    titleElement.textContent = examDetails.title;
+                }
+            }
+            
+            getExamDetails(examId) {
+                const exams = {
+                    'exam1': { title: 'Midterm Exam - Derivatives' },
+                    'exam2': { title: 'Quiz 3 - Integration Basics' },
+                    'exam3': { title: 'Final Exam - Comprehensive' }
+                };
+                return exams[examId] || { title: 'Unknown Exam' };
+            }
+            
+            showAnalyticsView(viewType) {
+                document.querySelectorAll('.analytics-view').forEach(view => {
+                    view.style.display = 'none';
+                });
+                
+                const selectedView = document.getElementById(`${viewType}-view`);
+                if (selectedView) {
+                    selectedView.style.display = 'block';
+                }
+                
+                document.querySelectorAll('.list-group-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                this.currentAnalyticsView = viewType;
+                setTimeout(() => this.initializeCharts(), 100);
+            }
+            
+            loadStudentsTable() {
+                const tableBody = document.getElementById('studentsPerformanceTable');
+                if (!tableBody) return;
+                
+                tableBody.innerHTML = this.studentsData.map(student => `
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <span class="text-white fw-bold">${student.name.charAt(0)}</span>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">${student.name}</div>
+                                    <small class="text-muted">ID: ${String(student.id).padStart(3, '0')}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge ${student.score >= 90 ? 'bg-success' : student.score >= 80 ? 'bg-info' : student.score >= 70 ? 'bg-warning' : 'bg-danger'}">${student.score}</span>
+                        </td>
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-success" style="width: ${student.aiAccuracy}%">${student.aiAccuracy}%</div>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark">${student.timeTaken}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            initializeCharts() {
+                this.initScoreDistributionChart();
+                this.initAIConfidenceChart();
+                
+                if (this.currentAnalyticsView === 'trends') {
+                    this.initTrendsChart();
+                }
+            }
+            
+            initScoreDistributionChart() {
+                const ctx = document.getElementById('scoreDistributionChart');
+                if (!ctx) return;
+                
+                if (this.charts.scoreDistribution) {
+                    this.charts.scoreDistribution.destroy();
+                }
+                
+                this.charts.scoreDistribution = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['0-40', '41-50', '51-60', '61-70', '71-80', '81-90', '91-100'],
+                        datasets: [{
+                            label: 'Number of Students',
+                            data: [1, 2, 3, 8, 12, 15, 4],
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+            
+            initAIConfidenceChart() {
+                const ctx = document.getElementById('aiConfidenceChart');
+                if (!ctx) return;
+                
+                if (this.charts.aiConfidence) {
+                    this.charts.aiConfidence.destroy();
+                }
+                
+                this.charts.aiConfidence = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['High (90-100%)', 'Good (80-89%)', 'Fair (70-79%)', 'Low (<70%)'],
+                        datasets: [{
+                            data: [32, 8, 4, 1],
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(255, 206, 86, 0.8)',
+                                'rgba(255, 99, 132, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            initTrendsChart() {
+                const ctx = document.getElementById('trendsChart');
+                if (!ctx) return;
+                
+                if (this.charts.trends) {
+                    this.charts.trends.destroy();
+                }
+                
+                this.charts.trends = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                        datasets: [{
+                            label: 'AI Accuracy (%)',
+                            data: [89, 92, 94, 93, 96, 96.2],
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.4
+                        }, {
+                            label: 'Average Score',
+                            data: [72, 75, 78, 76, 79, 78.5],
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            }
+            
+            exportToExcel() {
+                this.showAlert('Excel export feature coming soon!', 'info');
+            }
+            
+            exportToPDF() {
+                this.showAlert('PDF report generation in progress...', 'info');
+            }
+            
+            exportToCSV() {
+                this.showAlert('CSV export completed!', 'success');
+            }
+            
+            generateReport() {
+                this.showProcessing('Generating Report...', 'Compiling analytics data...');
+                
+                setTimeout(() => {
+                    this.hideProcessing();
+                    this.showAlert('Comprehensive analytics report generated!', 'success');
+                }, 3000);
+            }
+            
+            refreshAnalytics() {
+                this.showAlert('Analytics data refreshed!', 'info');
+                this.initializeCharts();
+            }
+            
+            viewStudentDetails(studentId) {
+                this.showAlert(`Viewing details for student ID: ${studentId}`, 'info');
+            }
+            
+            showProcessing(title, message) {
+                document.getElementById('processingAnalyticsTitle').textContent = title;
+                document.getElementById('processingAnalyticsMessage').textContent = message;
+                const modal = new bootstrap.Modal(document.getElementById('processingAnalyticsModal'));
+                modal.show();
+            }
+            
+            hideProcessing() {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('processingAnalyticsModal'));
+                if (modal) modal.hide();
+            }
+            
+            showAlert(message, type = 'info') {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.parentNode.removeChild(alertDiv);
+                    }
+                }, 5000);
+            }
+        }
+        
+        // Initialize analytics workflow
+        const analyticsWorkflow = new AnalyticsWorkflow();
+        
+        // Global functions
+        window.goToStep = (step) => analyticsWorkflow.goToStep(step);
+        window.connectGoogleClassroomAnalytics = () => analyticsWorkflow.connectGoogleClassroomAnalytics();
+        window.connectMoodleAnalytics = () => analyticsWorkflow.connectMoodleAnalytics();
+        window.authenticateGoogleClassroomAnalytics = () => analyticsWorkflow.authenticateGoogleClassroomAnalytics();
+        window.authenticateMoodleAnalytics = () => analyticsWorkflow.authenticateMoodleAnalytics();
+        window.selectCourse = (courseId) => analyticsWorkflow.selectCourse(courseId);
+        window.selectExamAnalytics = (examId) => analyticsWorkflow.selectExamAnalytics(examId);
+        window.showAnalyticsView = (viewType) => analyticsWorkflow.showAnalyticsView(viewType);
+        window.exportToExcel = () => analyticsWorkflow.exportToExcel();
+        window.exportToPDF = () => analyticsWorkflow.exportToPDF();
+        window.exportToCSV = () => analyticsWorkflow.exportToCSV();
+        window.generateReport = () => analyticsWorkflow.generateReport();
+        window.refreshAnalytics = () => analyticsWorkflow.refreshAnalytics();
+        window.viewStudentDetails = (studentId) => analyticsWorkflow.viewStudentDetails(studentId);
+        window.showApiTokenInfo = () => analyticsWorkflow.showAlert('API tokens can be generated in your Moodle profile under Security Keys.', 'info');
+    </script>
+</body>
+</html>

@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Evaluation Center - AI Grading Platform</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom Theme -->
+    <link href="/static/css/theme.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="/static/css/evaluation.css" rel="stylesheet">
+    
+    <style>
+        /* Additional styles for the evaluation workflow */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            opacity: 1;
+        }
+        
+        .step.completed {
+            opacity: 1;
+            color: var(--bs-success);
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-number {
+            background: var(--bs-primary);
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background: var(--bs-success);
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50px;
+            width: 40px;
+            height: 2px;
+            background: #e9ecef;
+            z-index: -1;
+        }
+        
+        .step.completed:not(:last-child)::after {
+            background: var(--bs-success);
+        }
+        
+        .step-content {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .evaluation-option {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent !important;
+        }
+        
+        .evaluation-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+        }
+        
+        .platform-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e9ecef;
+        }
+        
+        .platform-card:hover {
+            border-color: var(--bs-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .platform-card.connected {
+            border-color: var(--bs-success);
+            background-color: #f8fff8;
+        }
+        
+        .exam-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .exam-card:hover {
+            border-color: var(--bs-primary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .exam-card.selected {
+            border-color: var(--bs-primary);
+            background-color: #f8f9ff;
+        }
+        
+        .upload-option {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .paper-viewer {
+            position: relative;
+            height: 600px;
+            overflow: auto;
+            background: #f8f9fa;
+        }
+        
+        .annotation-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .annotation-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 193, 7, 0.8);
+            border: 2px solid #ffc107;
+            border-radius: 50%;
+            cursor: pointer;
+            pointer-events: all;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .annotation-marker:hover {
+            transform: scale(1.2);
+            background: rgba(255, 193, 7, 1);
+        }
+        
+        .annotation-highlight {
+            position: absolute;
+            background: rgba(255, 255, 0, 0.3);
+            border: 1px solid #ffeb3b;
+            pointer-events: none;
+        }
+        
+        .annotation-popup {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 200px;
+            z-index: 1000;
+            font-size: 12px;
+        }
+        
+        .annotations-active .annotation-layer {
+            pointer-events: all;
+        }
+        
+        .question-grade-item {
+            border: 1px solid #e9ecef;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            background: white;
+        }
+        
+        @media (max-width: 768px) {
+            .step-indicator {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .step-label {
+                font-size: 0.75rem;
+            }
+            
+            .step-number {
+                width: 30px;
+                height: 30px;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body class="fade-in">
+    <!-- Modern Navigation - Same as Main Page -->
+    <nav class="navbar navbar-expand-lg fixed-top" style="padding: 0.15rem 0; background: rgba(255, 255, 255, 0.98) !important; backdrop-filter: blur(10px); box-shadow: 0 1px 10px rgba(0,0,0,0.1); min-height: 50px;">
+        <div class="container-fluid px-5" style="display: flex; align-items: center;">
+            <!-- Logo positioned to align with hero content -->
+            <a class="navbar-brand d-flex align-items-center" href="/" style="margin: 0; margin-right: auto; flex-shrink: 0; padding-left: 0;">
+                <i class="fas fa-graduation-cap me-2 text-primary" style="font-size: 1.5rem;"></i>
+                <span class="fw-bold" style="font-size: 1.1rem; color: var(--primary-blue); white-space: nowrap;">AI Grading Platform</span>
+            </a>
+            
+            <!-- Center navigation options - Always visible on desktop -->
+            <ul class="navbar-nav d-none d-lg-flex mx-auto" style="gap: 1.2rem; flex-shrink: 0;">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active fw-semibold" href="/evaluation" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-clipboard-check me-1"></i>Start Evaluating
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/analytics" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-chart-line me-1"></i>Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/pricing.html" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-tags me-1"></i>Pricing
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Right side sign in options - Aligned with hero content right edge -->
+            <div class="d-none d-lg-flex align-items-center gap-2 auth-buttons" style="flex-shrink: 0;">
+                <button class="btn btn-outline-primary fw-semibold hover-lift" data-bs-toggle="tooltip" title="Create Teacher Account" style="padding: 0.35rem 0.9rem; border-radius: 5px; white-space: nowrap; font-size: 0.85rem;">
+                    <i class="fas fa-user-plus me-1"></i>
+                    Create Account
+                </button>
+                <button class="btn btn-primary fw-semibold hover-lift" data-bs-toggle="tooltip" title="Sign in as Teacher" style="padding: 0.35rem 0.9rem; border-radius: 5px; white-space: nowrap; font-size: 0.85rem;">
+                    <i class="fas fa-chalkboard-teacher me-1"></i>
+                    Teacher Sign In
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4" style="padding-top: 90px !important;">
+        <!-- Step Indicator -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="fw-bold mb-0">
+                                <i class="fas fa-brain me-2 text-primary"></i>
+                                AI Evaluation Center
+                            </h2>
+                            <div class="d-flex align-items-center">
+                                <div class="step-indicator">
+                                    <div class="step active" id="step1">
+                                        <span class="step-number">1</span>
+                                        <span class="step-label">Start</span>
+                                    </div>
+                                    <div class="step" id="step2">
+                                        <span class="step-number">2</span>
+                                        <span class="step-label">Connect</span>
+                                    </div>
+                                    <div class="step" id="step3">
+                                        <span class="step-number">3</span>
+                                        <span class="step-label">Select</span>
+                                    </div>
+                                    <div class="step" id="step4">
+                                        <span class="step-number">4</span>
+                                        <span class="step-label">Upload</span>
+                                    </div>
+                                    <div class="step" id="step5">
+                                        <span class="step-number">5</span>
+                                        <span class="step-label">Review</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Start Evaluation -->
+        <div id="step1-content" class="step-content active">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-body text-center p-5">
+                            <div class="mb-4">
+                                <i class="fas fa-graduation-cap text-primary" style="font-size: 4rem;"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">Welcome to AI Evaluation</h3>
+                            <p class="text-muted mb-5 lead">Start grading your exams and quizzes with AI-powered automation. Connect to your learning management system and let AI handle the heavy lifting.</p>
+                            
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="card border-2 border-primary h-100 evaluation-option" onclick="startNewEvaluation()" style="cursor: pointer;">
+                                        <div class="card-body text-center p-4">
+                                            <i class="fas fa-plus-circle text-primary mb-3" style="font-size: 3rem;"></i>
+                                            <h5 class="fw-bold mb-3">Start New Evaluation</h5>
+                                            <p class="text-muted mb-0">Begin a fresh evaluation session with new exams or quizzes</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-2 border-success h-100 evaluation-option" onclick="continueEvaluation()" style="cursor: pointer;">
+                                        <div class="card-body text-center p-4">
+                                            <i class="fas fa-play-circle text-success mb-3" style="font-size: 3rem;"></i>
+                                            <h5 class="fw-bold mb-3">Continue Evaluation</h5>
+                                            <p class="text-muted mb-0">Resume work on previously started evaluations</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Evaluations -->
+                            <div class="mt-5" id="recentEvaluations" style="display: none;">
+                                <h6 class="fw-bold mb-3">Recent Evaluations</h6>
+                                <div class="list-group">
+                                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">Mathematics Quiz - Chapter 5</h6>
+                                            <small class="text-muted">15 submissions pending review</small>
+                                        </div>
+                                        <span class="badge bg-warning">In Progress</span>
+                                    </div>
+                                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">History Essay - World War II</h6>
+                                            <small class="text-muted">28 submissions completed</small>
+                                        </div>
+                                        <span class="badge bg-success">Completed</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Platform Connection -->
+        <div id="step2-content" class="step-content" style="display: none;">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-link me-2"></i>
+                                Connect to Learning Management System
+                            </h4>
+                        </div>
+                        <div class="card-body p-5">
+                            <p class="text-muted mb-4">Choose your preferred learning management system to import exams and student submissions.</p>
+                            
+                            <div class="row justify-content-center g-4">
+                                <div class="col-md-6 col-lg-5">
+                                    <div class="card platform-card h-100" id="googleClassroomCard" style="cursor: pointer; transition: transform 0.2s ease; border: 2px solid #e9ecef;">
+                                        <div class="card-body text-center p-4 d-flex flex-column">
+                                            <i class="fab fa-google text-danger mb-3" style="font-size: 3.5rem;"></i>
+                                            <h5 class="fw-bold mb-3">Google Classroom</h5>
+                                            <p class="text-muted mb-3 flex-grow-1">Connect to Google Classroom to import assignments and student submissions for AI-powered grading</p>
+                                            <div class="connection-status" id="googleStatus">
+                                                <span class="badge bg-secondary px-3 py-2">Not Connected</span>
+                                            </div>
+                                            <button class="btn btn-outline-danger mt-3" onclick="connectGoogleClassroom()">
+                                                <i class="fab fa-google me-2"></i>Connect Now
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-secondary me-2">
+                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                </button>
+                                <button class="btn btn-primary" id="continueToStep3" disabled>
+                                    Continue <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Exam Selection -->
+        <div id="step3-content" class="step-content" style="display: none;">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-success text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-list-alt me-2"></i>
+                                Select Exam or Quiz
+                            </h4>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Connected Platform Info -->
+                            <div class="alert alert-success" id="connectedPlatformInfo">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Connected to <span id="connectedPlatformName">Google Classroom</span>
+                            </div>
+
+                            <!-- Search and Filter -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Search exams and quizzes..." id="examSearch">
+                                        <button class="btn btn-outline-secondary" type="button">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="subjectFilter">
+                                        <option value="">All Subjects</option>
+                                        <option value="math">Mathematics</option>
+                                        <option value="science">Science</option>
+                                        <option value="english">English</option>
+                                        <option value="history">History</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="statusFilter">
+                                        <option value="">All Status</option>
+                                        <option value="active">Active</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="draft">Draft</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Exams List -->
+                            <div id="examsList">
+                                <div class="exam-item">
+                                    <div class="card mb-3 exam-card">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-8">
+                                                    <h6 class="fw-bold mb-1">Mathematics Quiz - Algebra Fundamentals</h6>
+                                                    <p class="text-muted mb-2">
+                                                        <i class="fas fa-calendar me-1"></i>Due: December 15, 2024 |
+                                                        <i class="fas fa-users me-1"></i>32 students |
+                                                        <i class="fas fa-clock me-1"></i>60 minutes
+                                                    </p>
+                                                    <span class="badge bg-primary me-2">Mathematics</span>
+                                                    <span class="badge bg-success">Active</span>
+                                                </div>
+                                                <div class="col-md-4 text-end">
+                                                    <div class="mb-2">
+                                                        <strong>28/32</strong> submissions
+                                                    </div>
+                                                    <div class="progress" style="height: 6px;">
+                                                        <div class="progress-bar bg-success" style="width: 87.5%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="exam-item">
+                                    <div class="card mb-3 exam-card">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-8">
+                                                    <h6 class="fw-bold mb-1">Science Test - Cell Biology</h6>
+                                                    <p class="text-muted mb-2">
+                                                        <i class="fas fa-calendar me-1"></i>Due: December 12, 2024 |
+                                                        <i class="fas fa-users me-1"></i>25 students |
+                                                        <i class="fas fa-clock me-1"></i>45 minutes
+                                                    </p>
+                                                    <span class="badge bg-info me-2">Science</span>
+                                                    <span class="badge bg-warning">Completed</span>
+                                                </div>
+                                                <div class="col-md-4 text-end">
+                                                    <div class="mb-2">
+                                                        <strong>25/25</strong> submissions
+                                                    </div>
+                                                    <div class="progress" style="height: 6px;">
+                                                        <div class="progress-bar bg-success" style="width: 100%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="exam-item">
+                                    <div class="card mb-3 exam-card">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-8">
+                                                    <h6 class="fw-bold mb-1">History Essay - Industrial Revolution</h6>
+                                                    <p class="text-muted mb-2">
+                                                        <i class="fas fa-calendar me-1"></i>Due: December 20, 2024 |
+                                                        <i class="fas fa-users me-1"></i>30 students |
+                                                        <i class="fas fa-clock me-1"></i>90 minutes
+                                                    </p>
+                                                    <span class="badge bg-warning me-2">History</span>
+                                                    <span class="badge bg-primary">Active</span>
+                                                </div>
+                                                <div class="col-md-4 text-end">
+                                                    <div class="mb-2">
+                                                        <strong>18/30</strong> submissions
+                                                    </div>
+                                                    <div class="progress" style="height: 6px;">
+                                                        <div class="progress-bar bg-warning" style="width: 60%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-secondary me-2">
+                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                </button>
+                                <button class="btn btn-primary" id="continueToStep4" disabled>
+                                    Continue <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Upload Answer Key -->
+        <div id="step4-content" class="step-content" style="display: none;">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-warning text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-key me-2"></i>
+                                Upload Answer Key
+                            </h4>
+                        </div>
+                        <div class="card-body p-5">
+                            <!-- Selected Exam Info -->
+                            <div class="alert alert-info" id="selectedExamInfo">
+                                <h6 class="fw-bold mb-2">Selected Exam:</h6>
+                                <div id="selectedExamDetails">Mathematics Quiz - Algebra Fundamentals</div>
+                            </div>
+
+                            <!-- Upload Options -->
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="card border-2 border-primary upload-option">
+                                        <div class="card-body text-center p-4">
+                                            <i class="fas fa-file-pdf text-danger mb-3" style="font-size: 3rem;"></i>
+                                            <h6 class="fw-bold mb-3">Upload PDF Answer Key</h6>
+                                            <p class="text-muted mb-0">Upload a PDF file with the correct answers</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-2 border-success upload-option">
+                                        <div class="card-body text-center p-4">
+                                            <i class="fas fa-edit text-success mb-3" style="font-size: 3rem;"></i>
+                                            <h6 class="fw-bold mb-3">Manual Answer Entry</h6>
+                                            <p class="text-muted mb-0">Enter answers manually through our interface</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Upload Area -->
+                            <div class="mt-4" id="uploadArea" style="display: none;">
+                                <div class="border-2 border-dashed border-primary rounded p-5 text-center">
+                                    <i class="fas fa-cloud-upload-alt text-primary mb-3" style="font-size: 3rem;"></i>
+                                    <h6 class="fw-bold mb-3">Drop your answer key here or click to browse</h6>
+                                    <input type="file" class="form-control mb-3" id="answerKeyFile" accept=".pdf,.doc,.docx,.jpg,.png">
+                                    <p class="text-muted mb-0">Supported formats: PDF, DOC, DOCX, JPG, PNG (Max: 10MB)</p>
+                                </div>
+                            </div>
+
+                            <!-- Manual Entry Form -->
+                            <div class="mt-4" id="manualEntryForm" style="display: none;">
+                                <h6 class="fw-bold mb-3">Enter Answer Key</h6>
+                                <div id="questionsContainer">
+                                    <!-- Questions will be loaded dynamically -->
+                                </div>
+                                <button class="btn btn-outline-primary">
+                                    <i class="fas fa-plus me-2"></i>Add Question
+                                </button>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-secondary me-2">
+                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                </button>
+                                <button class="btn btn-primary" id="startEvaluation" disabled>
+                                    Start AI Evaluation <i class="fas fa-brain ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Review and Grade -->
+        <div id="step5-content" class="step-content" style="display: none;">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-users me-2"></i>
+                                Student Submissions
+                            </h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush" id="studentsList">
+                                <!-- Students will be loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grading Summary -->
+                    <div class="card border-0 shadow-sm mt-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Grading Progress</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <div class="h4 fw-bold text-primary" id="totalStudents">28</div>
+                                <small class="text-muted">Total Submissions</small>
+                            </div>
+                            <div class="progress mb-3" style="height: 10px;">
+                                <div class="progress-bar bg-success" id="gradingProgress" style="width: 75%"></div>
+                            </div>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="fw-bold text-success" id="gradedCount">21</div>
+                                    <small class="text-muted">Graded</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="fw-bold text-warning" id="pendingCount">7</div>
+                                    <small class="text-muted">Pending</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Review Area -->
+                <div class="col-md-9">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-primary text-white">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-user-graduate me-2"></i>
+                                        <span id="currentStudentName">John Smith</span> - Submission Review
+                                    </h5>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="btn-group">
+                                        <button class="btn btn-light btn-sm">
+                                            <i class="fas fa-chevron-left"></i> Previous
+                                        </button>
+                                        <button class="btn btn-light btn-sm">
+                                            Next <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- Student Info Bar -->
+                            <div class="bg-light p-3 border-bottom">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <strong>AI Confidence:</strong> <span class="badge bg-success ms-2">94%</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Current Grade:</strong> <span class="badge bg-primary ms-2" id="currentGrade">85/100</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Status:</strong> <span class="badge bg-warning ms-2" id="gradingStatus">Needs Review</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Paper Review Interface -->
+                            <div class="row g-0">
+                                <!-- Paper View -->
+                                <div class="col-lg-8 border-end">
+                                    <div class="p-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="fw-bold mb-0">Student Paper</h6>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-secondary">
+                                                    <i class="fas fa-search-minus"></i>
+                                                </button>
+                                                <button class="btn btn-outline-secondary">
+                                                    <i class="fas fa-search-plus"></i>
+                                                </button>
+                                                <button class="btn btn-outline-secondary" id="annotationToggleBtn">
+                                                    <i class="fas fa-highlighter"></i>
+                                                    <span class="d-none d-md-inline ms-1">Annotations</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Paper Image/PDF Viewer -->
+                                        <div class="paper-viewer border rounded" id="paperViewer">
+                                            <img src="https://via.placeholder.com/600x800/f8f9fa/6c757d?text=Student+Paper+Preview" 
+                                                 class="img-fluid" alt="Student Paper" id="paperImage">
+                                            
+                                            <!-- Annotation Layer -->
+                                            <div class="annotation-layer" id="annotationLayer">
+                                                <!-- Annotations will be overlaid here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Grading Panel -->
+                                <div class="col-lg-4">
+                                    <div class="p-4">
+                                        <h6 class="fw-bold mb-3">Question-wise Grading</h6>
+                                        
+                                        <div id="questionsGrading">
+                                            <!-- Question 1 -->
+                                            <div class="question-grade-item mb-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <strong>Question 1</strong>
+                                                    <span class="badge bg-light text-dark">10 marks</span>
+                                                </div>
+                                                <div class="row g-2 mb-2">
+                                                    <div class="col-6">
+                                                        <label class="form-label small">AI Grade:</label>
+                                                        <input type="number" class="form-control form-control-sm" value="8" readonly>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="form-label small">Your Grade:</label>
+                                                        <input type="number" class="form-control form-control-sm" value="8" max="10">
+                                                    </div>
+                                                </div>
+                                                <textarea class="form-control form-control-sm" rows="2" placeholder="Add feedback...">Good understanding of the concept, minor calculation error.</textarea>
+                                            </div>
+
+                                            <!-- Question 2 -->
+                                            <div class="question-grade-item mb-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <strong>Question 2</strong>
+                                                    <span class="badge bg-light text-dark">15 marks</span>
+                                                </div>
+                                                <div class="row g-2 mb-2">
+                                                    <div class="col-6">
+                                                        <label class="form-label small">AI Grade:</label>
+                                                        <input type="number" class="form-control form-control-sm" value="12" readonly>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="form-label small">Your Grade:</label>
+                                                        <input type="number" class="form-control form-control-sm" value="13" max="15">
+                                                    </div>
+                                                </div>
+                                                <textarea class="form-control form-control-sm" rows="2" placeholder="Add feedback...">Excellent work, showing all steps clearly.</textarea>
+                                            </div>
+
+                                            <!-- Question 3 -->
+                                            <div class="question-grade-item mb-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <strong>Question 3</strong>
+                                                    <span class="badge bg-light text-dark">20 marks</span>
+                                                </div>
+                                                <div class="row g-2 mb-2">
+                                                    <div class="col-6">
+                                                        <label class="form-label small">AI Grade:</label>
+                                                        <input type="number" class="form-control form-control-sm" value="16" readonly>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="form-label small">Your Grade:</label>
+                                                        <input type="number" class="form-control form-control-sm" value="16" max="20">
+                                                    </div>
+                                                </div>
+                                                <textarea class="form-control form-control-sm" rows="2" placeholder="Add feedback...">Partial credit for approach, but final answer is incorrect.</textarea>
+                                            </div>
+                                        </div>
+
+                                        <!-- Overall Grade -->
+                                        <div class="border-top pt-3">
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-6">
+                                                    <label class="form-label fw-bold">Total AI Grade:</label>
+                                                    <input type="number" class="form-control" value="36" readonly>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label class="form-label fw-bold">Final Grade:</label>
+                                                    <input type="number" class="form-control" value="37" max="45">
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Overall Feedback -->
+                                            <label class="form-label fw-bold">Overall Feedback:</label>
+                                            <textarea class="form-control mb-3" rows="3" placeholder="Add overall feedback for the student...">Strong performance overall. Keep practicing calculation accuracy.</textarea>
+                                            
+                                            <!-- Action Buttons -->
+                                            <div class="d-grid gap-2">
+                                                <button class="btn btn-success">
+                                                    <i class="fas fa-save me-2"></i>Save Grade
+                                                </button>
+                                                <button class="btn btn-outline-primary">
+                                                    <i class="fas fa-flag me-2"></i>Flag for Review
+                                                </button>
+                                                <button class="btn btn-outline-info">
+                                                    <i class="fas fa-sticky-note me-2"></i>View Annotations
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="text-center mt-4">
+                        <button class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Upload
+                        </button>
+                        <button class="btn btn-success">
+                            <i class="fas fa-check-circle me-2"></i>Finalize Evaluation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Classroom Connection Modal -->
+    <div class="modal fade" id="googleClassroomModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fab fa-google text-danger me-2"></i>
+                        Connect to Google Classroom
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fab fa-google text-danger mb-3" style="font-size: 4rem;"></i>
+                        <h6>Sign in with your Google Account</h6>
+                        <p class="text-muted">Connect your Google Classroom to import assignments and student submissions automatically.</p>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Required Permissions:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>View your courses and assignments</li>
+                            <li>View student submissions</li>
+                            <li>Export grades back to Classroom</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger">
+                        <i class="fab fa-google me-2"></i>Connect Google Classroom
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Modal -->
+    <div class="modal fade" id="processingModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-5">
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 id="processingTitle">Processing...</h5>
+                    <p class="text-muted mb-0" id="processingMessage">Please wait while we process your request.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/navigation.js"></script>
+    
+    <script>
+        // Evaluation Workflow Management
+        class EvaluationWorkflow {
+            constructor() {
+                this.currentStep = 1;
+                this.totalSteps = 5;
+                this.selectedPlatform = null;
+                this.selectedExam = null;
+                this.connectedPlatforms = new Set();
+                this.currentStudentIndex = 0;
+                this.students = [];
+                this.init();
+            }
+            
+            init() {
+                this.loadSampleData();
+                this.setupEventListeners();
+                this.updateStepIndicator();
+            }
+            
+            loadSampleData() {
+                // Sample student data for demonstration
+                this.students = [
+                    { id: 1, name: 'John Smith', grade: 85, status: 'graded', confidence: 94 },
+                    { id: 2, name: 'Sarah Johnson', grade: 92, status: 'graded', confidence: 96 },
+                    { id: 3, name: 'Mike Brown', grade: 78, status: 'pending', confidence: 87 },
+                    { id: 4, name: 'Emily Davis', grade: 88, status: 'pending', confidence: 91 },
+                    { id: 5, name: 'David Wilson', grade: 95, status: 'graded', confidence: 98 }
+                ];
+                
+                this.updateStudentsList();
+                this.updateGradingProgress();
+            }
+            
+            setupEventListeners() {
+                // File upload preview
+                const fileInput = document.getElementById('answerKeyFile');
+                if (fileInput) {
+                    fileInput.addEventListener('change', this.handleFileUpload.bind(this));
+                }
+                
+                // Search functionality
+                const examSearch = document.getElementById('examSearch');
+                if (examSearch) {
+                    examSearch.addEventListener('input', this.filterExams.bind(this));
+                }
+            }
+            
+            goToStep(step) {
+                if (step < 1 || step > this.totalSteps) return;
+                
+                // Hide current step
+                const currentContent = document.getElementById(`step${this.currentStep}-content`);
+                if (currentContent) {
+                    currentContent.style.display = 'none';
+                    currentContent.classList.remove('active');
+                }
+                
+                // Show new step
+                const newContent = document.getElementById(`step${step}-content`);
+                if (newContent) {
+                    newContent.style.display = 'block';
+                    newContent.classList.add('active');
+                }
+                
+                this.currentStep = step;
+                this.updateStepIndicator();
+            }
+            
+            updateStepIndicator() {
+                for (let i = 1; i <= this.totalSteps; i++) {
+                    const stepElement = document.getElementById(`step${i}`);
+                    if (stepElement) {
+                        stepElement.classList.remove('active', 'completed');
+                        if (i === this.currentStep) {
+                            stepElement.classList.add('active');
+                        } else if (i < this.currentStep) {
+                            stepElement.classList.add('completed');
+                        }
+                    }
+                }
+            }
+            
+            startNewEvaluation() {
+                this.goToStep(2);
+            }
+            
+            continueEvaluation() {
+                // Show recent evaluations
+                const recentDiv = document.getElementById('recentEvaluations');
+                if (recentDiv) {
+                    recentDiv.style.display = 'block';
+                }
+            }
+            
+            connectGoogleClassroom() {
+                const modal = new bootstrap.Modal(document.getElementById('googleClassroomModal'));
+                modal.show();
+            }
+            
+            async authenticateGoogleClassroom() {
+                this.showProcessing('Connecting to Google Classroom...', 'Authenticating with Google services...');
+                
+                try {
+                    // Check if user is already authenticated with Google
+                    const authMethod = localStorage.getItem('authMethod');
+                    const authToken = localStorage.getItem('authToken');
+                    
+                    if (authMethod === 'google' && authToken) {
+                        // User already logged in with Google, just check if we can access courses
+                        const coursesResponse = await fetch('/api/classroom/courses', {
+                            headers: {
+                                'Authorization': `Bearer ${authToken}`
+                            }
+                        });
+                        
+                        if (coursesResponse.ok) {
+                            // Already connected!
+                            this.hideProcessing();
+                            this.connectedPlatforms.add('google');
+                            this.selectedPlatform = 'google';
+                            this.updatePlatformStatus('google', true);
+                            
+                            // Close modal
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('googleClassroomModal'));
+                            modal.hide();
+                            
+                            // Enable continue button
+                            document.getElementById('continueToStep3').disabled = false;
+                            
+                            this.showAlert('Successfully connected to Google Classroom!', 'success');
+                            return;
+                        }
+                    }
+                    
+                    // Need to authenticate with Google
+                    const response = await fetch('/api/auth/google');
+                    const result = await response.json();
+                    
+                    if (response.ok && result.authorization_url) {
+                        // Redirect to Google OAuth
+                        window.location.href = result.authorization_url;
+                    } else {
+                        throw new Error('Failed to initiate Google authentication');
+                    }
+                    
+                } catch (error) {
+                    this.hideProcessing();
+                    console.error('Google Classroom authentication error:', error);
+                    this.showAlert('Failed to connect to Google Classroom. Please try again.', 'danger');
+                }
+            }
+            
+            updatePlatformStatus(platform, connected) {
+                const statusId = 'googleStatus';
+                const cardId = 'googleClassroomCard';
+                
+                const statusElement = document.getElementById(statusId);
+                const cardElement = document.getElementById(cardId);
+                
+                if (statusElement && cardElement) {
+                    if (connected) {
+                        statusElement.innerHTML = '<span class="badge bg-success">Connected</span>';
+                        cardElement.classList.add('connected');
+                    } else {
+                        statusElement.innerHTML = '<span class="badge bg-secondary">Not Connected</span>';
+                        cardElement.classList.remove('connected');
+                    }
+                }
+                
+                // Update connected platform info in step 3
+                if (connected) {
+                    const platformName = 'Google Classroom';
+                    const infoElement = document.getElementById('connectedPlatformName');
+                    if (infoElement) {
+                        infoElement.textContent = platformName;
+                    }
+                }
+            }
+            
+            selectExam(examId) {
+                // Remove selection from all exams
+                document.querySelectorAll('.exam-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // Select current exam
+                const examCard = document.querySelector(`[onclick="selectExam('${examId}')"] .exam-card`);
+                if (examCard) {
+                    examCard.classList.add('selected');
+                }
+                
+                this.selectedExam = examId;
+                document.getElementById('continueToStep4').disabled = false;
+                
+                // Update selected exam info in step 4
+                const examDetails = this.getExamDetails(examId);
+                const detailsElement = document.getElementById('selectedExamDetails');
+                if (detailsElement) {
+                    detailsElement.textContent = examDetails.title;
+                }
+            }
+            
+            getExamDetails(examId) {
+                const exams = {
+                    'exam1': { title: 'Mathematics Quiz - Algebra Fundamentals', subject: 'Mathematics' },
+                    'exam2': { title: 'Science Test - Cell Biology', subject: 'Science' },
+                    'exam3': { title: 'History Essay - Industrial Revolution', subject: 'History' }
+                };
+                return exams[examId] || { title: 'Unknown Exam', subject: 'Unknown' };
+            }
+            
+            filterExams() {
+                const searchTerm = document.getElementById('examSearch').value.toLowerCase();
+                const subjectFilter = document.getElementById('subjectFilter').value;
+                const statusFilter = document.getElementById('statusFilter').value;
+                
+                document.querySelectorAll('.exam-item').forEach(item => {
+                    const title = item.querySelector('h6').textContent.toLowerCase();
+                    const subject = item.querySelector('.badge').textContent.toLowerCase();
+                    const status = item.querySelectorAll('.badge')[1].textContent.toLowerCase();
+                    
+                    const matchesSearch = title.includes(searchTerm);
+                    const matchesSubject = !subjectFilter || subject.includes(subjectFilter);
+                    const matchesStatus = !statusFilter || status.includes(statusFilter);
+                    
+                    item.style.display = matchesSearch && matchesSubject && matchesStatus ? 'block' : 'none';
+                });
+            }
+            
+            uploadPDFAnswerKey() {
+                document.getElementById('uploadArea').style.display = 'block';
+                document.getElementById('manualEntryForm').style.display = 'none';
+            }
+            
+            manualAnswerKey() {
+                document.getElementById('uploadArea').style.display = 'none';
+                document.getElementById('manualEntryForm').style.display = 'block';
+                this.loadQuestions();
+            }
+            
+            loadQuestions() {
+                const container = document.getElementById('questionsContainer');
+                if (!container) return;
+                
+                // Sample questions based on selected exam
+                const questions = [
+                    { number: 1, type: 'multiple-choice', options: ['A', 'B', 'C', 'D'], answer: 'B' },
+                    { number: 2, type: 'short-answer', answer: 'Photosynthesis' },
+                    { number: 3, type: 'essay', points: 20 }
+                ];
+                
+                container.innerHTML = questions.map(q => `
+                    <div class="question-item border rounded p-3 mb-3">
+                        <h6>Question ${q.number}</h6>
+                        ${q.type === 'multiple-choice' ? `
+                            <select class="form-select">
+                                <option value="">Select correct answer</option>
+                                ${q.options.map(opt => `<option value="${opt}" ${opt === q.answer ? 'selected' : ''}>${opt}</option>`).join('')}
+                            </select>
+                        ` : q.type === 'short-answer' ? `
+                            <input type="text" class="form-control" placeholder="Enter correct answer" value="${q.answer || ''}">
+                        ` : `
+                            <textarea class="form-control" rows="3" placeholder="Enter grading criteria or model answer"></textarea>
+                        `}
+                    </div>
+                `).join('');
+            }
+            
+            handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    document.getElementById('startEvaluation').disabled = false;
+                    this.showAlert(`Answer key "${file.name}" uploaded successfully!`, 'success');
+                }
+            }
+            
+            startAIEvaluation() {
+                this.showProcessing('Starting AI Evaluation...', 'Analyzing answer key and fetching student submissions...');
+                
+                setTimeout(() => {
+                    this.hideProcessing();
+                    this.goToStep(5);
+                    this.showAlert('AI evaluation completed! Review and edit grades below.', 'success');
+                }, 3000);
+            }
+            
+            updateStudentsList() {
+                const listElement = document.getElementById('studentsList');
+                if (!listElement) return;
+                
+                listElement.innerHTML = this.students.map((student, index) => `
+                    <div class="list-group-item list-group-item-action ${index === this.currentStudentIndex ? 'active' : ''}" 
+                        >
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">${student.name}</h6>
+                            <span class="badge ${student.status === 'graded' ? 'bg-success' : 'bg-warning'}">${student.grade || 'Pending'}</span>
+                        </div>
+                        <small class="text-muted">Confidence: ${student.confidence}%</small>
+                    </div>
+                `).join('');
+            }
+            
+            updateGradingProgress() {
+                const gradedStudents = this.students.filter(s => s.status === 'graded').length;
+                const pendingStudents = this.students.length - gradedStudents;
+                const progressPercent = (gradedStudents / this.students.length) * 100;
+                
+                document.getElementById('totalStudents').textContent = this.students.length;
+                document.getElementById('gradedCount').textContent = gradedStudents;
+                document.getElementById('pendingCount').textContent = pendingStudents;
+                document.getElementById('gradingProgress').style.width = `${progressPercent}%`;
+            }
+            
+            selectStudent(index) {
+                this.currentStudentIndex = index;
+                this.updateStudentsList();
+                this.loadCurrentStudent();
+            }
+            
+            loadCurrentStudent() {
+                const student = this.students[this.currentStudentIndex];
+                if (!student) return;
+                
+                document.getElementById('currentStudentName').textContent = student.name;
+                document.getElementById('currentGrade').textContent = `${student.grade || 0}/100`;
+                document.getElementById('gradingStatus').textContent = student.status === 'graded' ? 'Completed' : 'Needs Review';
+                document.getElementById('gradingStatus').className = `badge ms-2 ${student.status === 'graded' ? 'bg-success' : 'bg-warning'}`;
+            }
+            
+            previousStudent() {
+                if (this.currentStudentIndex > 0) {
+                    this.selectStudent(this.currentStudentIndex - 1);
+                }
+            }
+            
+            nextStudent() {
+                if (this.currentStudentIndex < this.students.length - 1) {
+                    this.selectStudent(this.currentStudentIndex + 1);
+                }
+            }
+            
+            saveGrade() {
+                const student = this.students[this.currentStudentIndex];
+                student.status = 'graded';
+                this.updateStudentsList();
+                this.updateGradingProgress();
+                this.showAlert('Grade saved successfully!', 'success');
+            }
+            
+            flagForReview() {
+                this.showAlert('Submission flagged for review', 'info');
+            }
+            
+            viewAnnotations() {
+                this.toggleAnnotations();
+            }
+            
+            toggleAnnotations() {
+                const annotationLayer = document.getElementById('annotationLayer');
+                const paperViewer = document.getElementById('paperViewer');
+                const toggleBtn = document.getElementById('annotationToggleBtn');
+                
+                if (paperViewer.classList.contains('annotations-active')) {
+                    // Hide annotations
+                    paperViewer.classList.remove('annotations-active');
+                    toggleBtn.classList.remove('btn-warning');
+                    toggleBtn.classList.add('btn-outline-secondary');
+                    this.showAlert('Annotations hidden', 'info');
+                } else {
+                    // Show annotations
+                    paperViewer.classList.add('annotations-active');
+                    toggleBtn.classList.remove('btn-outline-secondary');
+                    toggleBtn.classList.add('btn-warning');
+                    this.loadSampleAnnotations();
+                    this.showAlert('Annotations displayed - Click on markers for details', 'success');
+                }
+            }
+            
+            loadSampleAnnotations() {
+                const annotationLayer = document.getElementById('annotationLayer');
+                
+                // Clear existing annotations
+                annotationLayer.innerHTML = '';
+                
+                // Sample annotations data
+                const annotations = [
+                    {
+                        id: 1,
+                        x: 15,
+                        y: 12,
+                        type: 'error',
+                        text: 'Calculation error: 2+2=5 should be 2+2=4',
+                        score: -2
+                    },
+                    {
+                        id: 2,
+                        x: 45,
+                        y: 25,
+                        type: 'partial',
+                        text: 'Correct approach but incomplete solution',
+                        score: 1
+                    },
+                    {
+                        id: 3,
+                        x: 25,
+                        y: 40,
+                        type: 'correct',
+                        text: 'Excellent work! Perfect methodology',
+                        score: 3
+                    },
+                    {
+                        id: 4,
+                        x: 60,
+                        y: 55,
+                        type: 'suggestion',
+                        text: 'Consider showing more steps for clarity',
+                        score: 0
+                    },
+                    {
+                        id: 5,
+                        x: 35,
+                        y: 70,
+                        type: 'error',
+                        text: 'Missing units in final answer',
+                        score: -1
+                    }
+                ];
+                
+                // Create annotation markers
+                annotations.forEach(annotation => {
+                    const marker = document.createElement('div');
+                    marker.className = `annotation-marker annotation-${annotation.type}`;
+                    marker.style.left = `${annotation.x}%`;
+                    marker.style.top = `${annotation.y}%`;
+                    marker.textContent = annotation.id;
+                    marker.setAttribute('data-annotation-id', annotation.id);
+                    
+                    // Set marker color based on type
+                    switch(annotation.type) {
+                        case 'error':
+                            marker.style.background = 'rgba(220, 53, 69, 0.8)';
+                            marker.style.borderColor = '#dc3545';
+                            marker.style.color = 'white';
+                            break;
+                        case 'correct':
+                            marker.style.background = 'rgba(40, 167, 69, 0.8)';
+                            marker.style.borderColor = '#28a745';
+                            marker.style.color = 'white';
+                            break;
+                        case 'partial':
+                            marker.style.background = 'rgba(255, 193, 7, 0.8)';
+                            marker.style.borderColor = '#ffc107';
+                            marker.style.color = '#000';
+                            break;
+                        case 'suggestion':
+                            marker.style.background = 'rgba(23, 162, 184, 0.8)';
+                            marker.style.borderColor = '#17a2b8';
+                            marker.style.color = 'white';
+                            break;
+                    }
+                    
+                    // Add click event for popup
+                    marker.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.showAnnotationPopup(annotation, e.target);
+                    });
+                    
+                    annotationLayer.appendChild(marker);
+                });
+            }
+            
+            showAnnotationPopup(annotation, marker) {
+                // Remove existing popups
+                document.querySelectorAll('.annotation-popup').forEach(popup => popup.remove());
+                
+                const popup = document.createElement('div');
+                popup.className = 'annotation-popup';
+                popup.innerHTML = `
+                    <div class="fw-bold mb-2">
+                        <i class="fas fa-${this.getAnnotationIcon(annotation.type)} me-1"></i>
+                        ${annotation.type.charAt(0).toUpperCase() + annotation.type.slice(1)}
+                    </div>
+                    <div class="mb-2">${annotation.text}</div>
+                    <div class="text-end">
+                        <small class="text-muted">
+                            Score: ${annotation.score > 0 ? '+' : ''}${annotation.score}
+                        </small>
+                    </div>
+                `;
+                
+                // Position popup near the marker
+                const rect = marker.getBoundingClientRect();
+                const viewerRect = document.getElementById('paperViewer').getBoundingClientRect();
+                
+                popup.style.left = (rect.left - viewerRect.left + 25) + 'px';
+                popup.style.top = (rect.top - viewerRect.top - 10) + 'px';
+                
+                document.getElementById('annotationLayer').appendChild(popup);
+                
+                // Auto-hide popup after 5 seconds
+                setTimeout(() => {
+                    if (popup.parentNode) {
+                        popup.remove();
+                    }
+                }, 5000);
+                
+                // Hide popup when clicking elsewhere
+                const hidePopup = (e) => {
+                    if (!popup.contains(e.target) && !marker.contains(e.target)) {
+                        popup.remove();
+                        document.removeEventListener('click', hidePopup);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', hidePopup), 100);
+            }
+            
+            getAnnotationIcon(type) {
+                switch(type) {
+                    case 'error': return 'times-circle';
+                    case 'correct': return 'check-circle';
+                    case 'partial': return 'exclamation-triangle';
+                    case 'suggestion': return 'lightbulb';
+                    default: return 'comment';
+                }
+            }
+            
+            finalizeEvaluation() {
+                const pendingCount = this.students.filter(s => s.status === 'pending').length;
+                if (pendingCount > 0) {
+                    this.showAlert(`You have ${pendingCount} pending submissions. Please complete all grading before finalizing.`, 'warning');
+                    return;
+                }
+                
+                this.showAlert('Evaluation finalized! Grades have been exported to your LMS.', 'success');
+                setTimeout(() => {
+                    window.location.href = '/analytics';
+                }, 2000);
+            }
+            
+            showProcessing(title, message) {
+                document.getElementById('processingTitle').textContent = title;
+                document.getElementById('processingMessage').textContent = message;
+                const modal = new bootstrap.Modal(document.getElementById('processingModal'));
+                modal.show();
+            }
+            
+            hideProcessing() {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('processingModal'));
+                if (modal) modal.hide();
+            }
+            
+            showAlert(message, type = 'info') {
+                // Create alert element
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                document.body.appendChild(alertDiv);
+                
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.parentNode.removeChild(alertDiv);
+                    }
+                }, 5000);
+            }
+        }
+        
+        // Initialize evaluation workflow
+        const evaluationWorkflow = new EvaluationWorkflow();
+        
+        // Global functions for template access
+        window.startNewEvaluation = () => evaluationWorkflow.startNewEvaluation();
+        window.continueEvaluation = () => evaluationWorkflow.continueEvaluation();
+        window.goToStep = (step) => evaluationWorkflow.goToStep(step);
+        window.connectGoogleClassroom = () => evaluationWorkflow.connectGoogleClassroom();
+        window.authenticateGoogleClassroom = () => evaluationWorkflow.authenticateGoogleClassroom();
+        window.selectExam = (examId) => evaluationWorkflow.selectExam(examId);
+        window.uploadPDFAnswerKey = () => evaluationWorkflow.uploadPDFAnswerKey();
+        window.manualAnswerKey = () => evaluationWorkflow.manualAnswerKey();
+        window.addQuestion = () => evaluationWorkflow.addQuestion();
+        window.startAIEvaluation = () => evaluationWorkflow.startAIEvaluation();
+        window.previousStudent = () => evaluationWorkflow.previousStudent();
+        window.nextStudent = () => evaluationWorkflow.nextStudent();
+        window.saveGrade = () => evaluationWorkflow.saveGrade();
+        window.flagForReview = () => evaluationWorkflow.flagForReview();
+        window.viewAnnotations = () => evaluationWorkflow.viewAnnotations();
+        window.finalizeEvaluation = () => evaluationWorkflow.finalizeEvaluation();
+        window.zoomIn = () => console.log('Zoom in');
+        window.zoomOut = () => console.log('Zoom out');
+        window.toggleAnnotations = () => evaluationWorkflow.toggleAnnotations();
+        window.showApiTokenInfo = () => evaluationWorkflow.showAlert('API tokens can be generated in your Moodle profile under Security Keys.', 'info');
+    </script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+/* Dashboard Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+.sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: .5rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #333;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    margin: 0.125rem 0.5rem;
+}
+
+.sidebar .nav-link:hover {
+    color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.sidebar .nav-link.active {
+    color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.sidebar .nav-link i {
+    width: 16px;
+    height: 16px;
+}
+
+/* Custom card styles */
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+
+.border-left-dark {
+    border-left: 0.25rem solid #5a5c69 !important;
+}
+
+/* Stats cards */
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+
+.text-xs {
+    font-size: 0.7rem;
+}
+
+/* Content sections */
+.content-section {
+    min-height: calc(100vh - 120px);
+}
+
+/* Loading states */
+.loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 0.125rem solid rgba(13, 110, 253, 0.25);
+    border-right-color: #0d6efd;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive tables */
+.table-responsive {
+    border-radius: 0.375rem;
+}
+
+/* Notification styles */
+.notification-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e3e6f0;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fc;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-unread {
+    background-color: #e7f3ff;
+    border-left: 3px solid #0d6efd;
+}
+
+/* Status badges */
+.status-pending {
+    background-color: #ffc107 !important;
+}
+
+.status-graded {
+    background-color: #198754 !important;
+}
+
+.status-review {
+    background-color: #fd7e14 !important;
+}
+
+.status-draft {
+    background-color: #6c757d !important;
+}
+
+/* Quick actions */
+.quick-actions .btn {
+    text-align: left;
+    justify-content: flex-start;
+}
+
+/* Charts container */
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+/* System status indicators */
+.system-status .status-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.system-status .status-item:last-child {
+    border-bottom: none;
+}
+
+/* Recent actions timeline */
+.recent-actions-timeline {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.recent-actions-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e3e6f0;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -0.375rem;
+    top: 0.25rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background-color: #0d6efd;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 767.98px) {
+    .sidebar {
+        top: 5rem;
+        padding-top: 0;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .stats-cards .col-xl-3 {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .sidebar {
+        background-color: #1a1a1a;
+        border-color: #333;
+    }
+    
+    .sidebar .nav-link {
+        color: #e9ecef;
+    }
+    
+    .sidebar .nav-link:hover {
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Print styles */
+@media print {
+    .sidebar,
+    .navbar,
+    .btn,
+    .dropdown {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+    }
+}

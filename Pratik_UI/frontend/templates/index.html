@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Automated Grading Platform</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom Theme -->
+    <link href="/static/css/theme.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/static/js/enhanced-ui.js" as="script">
+    <link rel="preload" href="/static/js/navigation.js" as="script">
+</head>
+<body class="fade-in">
+    <!-- Modern Navigation - Extra-Thin Desktop Optimized -->
+    <nav class="navbar navbar-expand-lg fixed-top" style="padding: 0.15rem 0; background: rgba(255, 255, 255, 0.98) !important; backdrop-filter: blur(10px); box-shadow: 0 1px 10px rgba(0,0,0,0.1); min-height: 50px;">
+        <div class="container-fluid px-5" style="display: flex; align-items: center;">
+            <!-- Logo positioned to align with hero content -->
+            <a class="navbar-brand d-flex align-items-center" href="/" style="margin: 0; margin-right: auto; flex-shrink: 0; padding-left: 0;">
+                <i class="fas fa-graduation-cap me-2 text-primary" style="font-size: 1.5rem;"></i>
+                <span class="fw-bold" style="font-size: 1.1rem; color: var(--primary-blue); white-space: nowrap;">AI Grading Platform</span>
+            </a>
+            
+            <!-- Center navigation options - Always visible on desktop -->
+            <ul class="navbar-nav d-none d-lg-flex mx-auto" style="gap: 1.2rem; flex-shrink: 0;">
+                <li class="nav-item">
+                    <a class="nav-link active fw-semibold" href="/" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/evaluation" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-clipboard-check me-1"></i>Start Evaluating
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/analytics" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-chart-line me-1"></i>Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/pricing.html" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-tags me-1"></i>Pricing
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Right side sign in options - Aligned with hero content right edge -->
+            <div class="d-none d-lg-flex align-items-center gap-2 auth-buttons" style="flex-shrink: 0;">
+                <a class="btn btn-outline-primary fw-semibold hover-lift" href="/auth/teacher_signup.html" data-bs-toggle="tooltip" title="Create Teacher Account" style="padding: 0.35rem 0.9rem; border-radius: 5px; white-space: nowrap; font-size: 0.85rem;">
+                    <i class="fas fa-user-plus me-1"></i>
+                    Create Account
+                </a>
+                <a class="btn btn-primary fw-semibold hover-lift" href="/auth/teacher_login.html" data-bs-toggle="tooltip" title="Sign in as Teacher" style="padding: 0.35rem 0.9rem; border-radius: 5px; white-space: nowrap; font-size: 0.85rem;">
+                    <i class="fas fa-chalkboard-teacher me-1"></i>
+                    Teacher Sign In
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section" style="padding-top: 70px;">
+        <div class="container-fluid px-5">
+            <div class="row align-items-center" style="min-height: 85vh;">
+                <div class="col-lg-7 hero-content">
+                    <div class="slide-up pe-5">
+                        <h1 class="display-2 fw-bold mb-4" style="line-height: 1.1;">
+                            Revolutionize Education with
+                            <span class="text-warning">AI-Powered</span>
+                            Grading
+                        </h1>
+                        <p class="lead mb-5 opacity-90 fs-4" style="max-width: 600px;">
+                            Transform your assessment workflow with intelligent automation, advanced OCR technology, 
+                            and comprehensive analytics. Join thousands of educators who've streamlined their grading process.
+                        </p>
+                        
+                        <div class="d-flex gap-4 mb-5">
+                            <a class="btn btn-light btn-lg shadow-soft px-5 py-3" href="/evaluation" style="font-size: 1.2rem;">
+                                <i class="fas fa-rocket me-2"></i>
+                                Start Evaluating Now
+                            </a>
+                            <button class="btn btn-outline-light btn-lg px-4 py-3" style="font-size: 1.1rem;">
+                                <i class="fas fa-play me-2"></i>
+                                Watch Demo
+                            </button>
+                        </div>
+                        
+                        <!-- Trust Indicators -->
+                        <div class="d-flex align-items-center gap-5 text-white opacity-75">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-star text-warning me-2 fs-5"></i>
+                                <span class="fw-semibold fs-5">4.9/5 Rating</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-users me-2 fs-5"></i>
+                                <span class="fw-semibold fs-5">10K+ Teachers</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-shield-check me-2 fs-5"></i>
+                                <span class="fw-semibold fs-5">Secure & Private</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-5">
+                    <div class="text-center slide-up" style="animation-delay: 0.3s;">
+                        <!-- Modern Dashboard Preview -->
+                        <div class="position-relative">
+                            <div class="bg-white rounded-4 shadow-xl p-5 mb-4" style="max-width: 500px; margin: 0 auto;">
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-graduation-cap text-white fs-5"></i>
+                                    </div>
+                                    <div class="text-start">
+                                        <h5 class="mb-1 text-dark fw-bold">AI Grading Dashboard</h5>
+                                        <small class="text-muted">Real-time Analytics</small>
+                                    </div>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <div class="bg-light rounded-3 p-4 text-center">
+                                            <h3 class="text-primary mb-1 fw-bold">98%</h3>
+                                            <small class="text-muted fw-semibold">Accuracy</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="bg-light rounded-3 p-4 text-center">
+                                            <h3 class="text-success mb-1 fw-bold">3.5x</h3>
+                                            <small class="text-muted fw-semibold">Faster</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="bg-gradient-primary rounded-3 p-3 text-center">
+                                            <h6 class="text-white mb-0 fw-semibold">
+                                                <i class="fas fa-brain me-2"></i>
+                                                AI-Powered Analysis Ready
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Floating Elements -->
+                            <div class="position-absolute top-0 end-0 bg-success text-white rounded-pill px-4 py-2 shadow-lg">
+                                <i class="fas fa-check me-2"></i>
+                                <small class="fw-semibold">AI Powered</small>
+                            </div>
+                            
+                            <div class="position-absolute bottom-0 start-0 bg-warning text-dark rounded-pill px-4 py-2 shadow-lg">
+                                <i class="fas fa-lightning me-2"></i>
+                                <small class="fw-semibold">Ultra Fast</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5" style="margin-top: -80px; position: relative; z-index: 10;">
+        <div class="container-fluid px-5">
+            <!-- Stats Row -->
+            <div class="row g-4 mb-5 justify-content-center">
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                    <div class="stats-card text-center h-100">
+                        <div class="stats-number">98%</div>
+                        <div class="stats-label">Accuracy Rate</div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                    <div class="stats-card text-center h-100">
+                        <div class="stats-number">10K+</div>
+                        <div class="stats-label">Active Teachers</div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                    <div class="stats-card text-center h-100">
+                        <div class="stats-number">5M+</div>
+                        <div class="stats-label">Papers Graded</div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                    <div class="stats-card text-center h-100">
+                        <div class="stats-number">75%</div>
+                        <div class="stats-label">Time Saved</div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                    <div class="stats-card text-center h-100">
+                        <div class="stats-number">24/7</div>
+                        <div class="stats-label">Support</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Spacer for better section separation -->
+            <div class="row">
+                <div class="col-12">
+                    <div style="height: 6rem;"></div>
+                </div>
+            </div>
+            
+            <!-- Features Header -->
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary mb-3">Powerful AI Features</h2>
+                    <p class="lead text-muted fs-5">Everything you need for efficient, accurate, and intelligent grading</p>
+                </div>
+            </div>
+            
+            <!-- Features Grid -->
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-soft">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Advanced OCR Technology</h5>
+                            <p class="text-muted mb-4">State-of-the-art optical character recognition that accurately reads handwritten and printed text with 98% precision.</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <span class="badge bg-primary">Handwriting</span>
+                                <span class="badge bg-success">Multi-language</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-soft">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">AI-Powered Grading</h5>
+                            <p class="text-muted mb-4">Intelligent algorithms that understand context, provide detailed feedback, and ensure consistent grading standards.</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <span class="badge bg-success">Smart Analysis</span>
+                                <span class="badge bg-info">Consistent</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-soft">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Real-time Analytics</h5>
+                            <p class="text-muted mb-4">Comprehensive dashboards with insights into student performance, grading patterns, and learning outcomes.</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <span class="badge bg-warning">Insights</span>
+                                <span class="badge bg-primary">Real-time</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-soft">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Classroom Integration</h5>
+                            <p class="text-muted mb-4">Seamlessly integrates with Google Classroom, Canvas, and other popular learning management systems.</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <span class="badge" style="background: #4285f4; color: white;">
+                                    <i class="fab fa-google me-1"></i>Google
+                                </span>
+                                <span class="badge bg-dark">Canvas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-soft">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Enterprise Security</h5>
+                            <p class="text-muted mb-4">Bank-grade encryption, GDPR compliance, and secure data handling to protect student information and academic integrity.</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <span class="badge bg-danger">Encrypted</span>
+                                <span class="badge bg-secondary">GDPR</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-soft">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Smart Feedback</h5>
+                            <p class="text-muted mb-4">Personalized feedback generation that helps students understand their mistakes and improve their learning outcomes.</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <span class="badge bg-info">Personalized</span>
+                                <span class="badge bg-success">Helpful</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analytics Dashboard Section -->
+    <section class="py-5" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); margin-top: 4rem;">
+        <div class="container-fluid" style="max-width: 1600px; padding: 0 3rem;">
+            <!-- Section Header -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-lg-8 text-center">
+                    <h2 class="display-4 fw-bold text-primary mb-4">Analytics Dashboard</h2>
+                    <p class="lead text-muted fs-4">Comprehensive insights and real-time performance metrics</p>
+                </div>
+            </div>
+            
+            <!-- Dashboard Content - Horizontal Layout -->
+            <div class="row g-4">
+                <!-- Left Side - Performance Metrics (70% width) -->
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-lg h-100" style="border-radius: 1.5rem;">
+                        <div class="card-header text-white" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem;">
+                            <h5 class="mb-0 fw-bold fs-4">
+                                <i class="fas fa-chart-line me-3"></i>
+                                Performance Analytics
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Stats Row - 4 Column Horizontal Layout -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-6 col-lg-3">
+                                    <div class="text-center p-3 rounded-3" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #bfdbfe;">
+                                        <h3 class="text-primary mb-1 fw-bold fs-2">2,847</h3>
+                                        <small class="text-muted fw-semibold">Total Submissions</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <div class="text-center p-3 rounded-3" style="background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 1px solid #a7f3d0;">
+                                        <h3 class="text-success mb-1 fw-bold fs-2">94.2%</h3>
+                                        <small class="text-muted fw-semibold">Average Score</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <div class="text-center p-3 rounded-3" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #fcd34d;">
+                                        <h3 class="text-warning mb-1 fw-bold fs-2">45s</h3>
+                                        <small class="text-muted fw-semibold">Avg. Grade Time</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <div class="text-center p-3 rounded-3" style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border: 1px solid #7dd3fc;">
+                                        <h3 class="text-info mb-1 fw-bold fs-2">156</h3>
+                                        <small class="text-muted fw-semibold">Active Students</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Progress Indicators - 2 Column Horizontal -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-semibold fs-6">Grading Progress</span>
+                                            <span class="text-muted fw-bold">85%</span>
+                                        </div>
+                                        <div class="progress" style="height: 10px; border-radius: 5px;">
+                                            <div class="progress-bar" style="background: linear-gradient(90deg, #2563eb, #3b82f6); width: 85%; border-radius: 5px;" data-width="85%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-semibold fs-6">Accuracy Rate</span>
+                                            <span class="text-muted fw-bold">98.5%</span>
+                                        </div>
+                                        <div class="progress" style="height: 10px; border-radius: 5px;">
+                                            <div class="progress-bar bg-success" style="width: 98.5%; border-radius: 5px;" data-width="98.5%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Performance Insights Area -->
+                            <div class="p-3 rounded-3" style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); border: 1px solid #e2e8f0;">
+                                <h6 class="fw-bold mb-3 text-dark fs-6">
+                                    <i class="fas fa-tachometer-alt me-2 text-primary"></i>
+                                    Performance Insights
+                                </h6>
+                                
+                                <!-- Speedometer Style Gauges -->
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <div class="text-center p-2" style="background: white; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                            <!-- Simple Circular Progress -->
+                                            <div class="position-relative d-inline-block mb-2">
+                                                <svg width="50" height="50" viewBox="0 0 50 50">
+                                                    <!-- Background circle -->
+                                                    <circle cx="25" cy="25" r="20" stroke="#e2e8f0" stroke-width="4" fill="none"/>
+                                                    <!-- Progress circle (85% = 306 degrees) -->
+                                                    <circle cx="25" cy="25" r="20" stroke="#3b82f6" stroke-width="4" fill="none" 
+                                                            stroke-dasharray="106.8 125.6" stroke-dashoffset="31.4" 
+                                                            stroke-linecap="round" transform="rotate(-90 25 25)"/>
+                                                </svg>
+                                                <div class="position-absolute top-50 start-50 translate-middle">
+                                                    <div class="fw-bold text-primary" style="font-size: 0.7rem;">85%</div>
+                                                </div>
+                                            </div>
+                                            <div><small class="text-muted" style="font-size: 0.65rem;">Efficiency</small></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-center p-2" style="background: white; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                            <!-- Simple Circular Progress -->
+                                            <div class="position-relative d-inline-block mb-2">
+                                                <svg width="50" height="50" viewBox="0 0 50 50">
+                                                    <!-- Background circle -->
+                                                    <circle cx="25" cy="25" r="20" stroke="#e2e8f0" stroke-width="4" fill="none"/>
+                                                    <!-- Progress circle (97% = 349 degrees) -->
+                                                    <circle cx="25" cy="25" r="20" stroke="#10b981" stroke-width="4" fill="none" 
+                                                            stroke-dasharray="121.7 125.6" stroke-dashoffset="31.4" 
+                                                            stroke-linecap="round" transform="rotate(-90 25 25)"/>
+                                                </svg>
+                                                <div class="position-absolute top-50 start-50 translate-middle">
+                                                    <div class="fw-bold text-success" style="font-size: 0.7rem;">97%</div>
+                                                </div>
+                                            </div>
+                                            <div><small class="text-muted" style="font-size: 0.65rem;">Accuracy</small></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Quick Stats Labels -->
+                                <div class="row g-2 mt-3">
+                                    <div class="col-4">
+                                        <div class="text-center py-2 px-2 rounded-2" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.12)); border: 1px solid rgba(59, 130, 246, 0.15);">
+                                            <div class="fw-bold text-primary" style="font-size: 0.75rem;">2.3k</div>
+                                            <small class="text-muted" style="font-size: 0.65rem; font-weight: 500;">This Week</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="text-center py-2 px-2 rounded-2" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.12)); border: 1px solid rgba(16, 185, 129, 0.15);">
+                                            <div class="fw-bold text-success" style="font-size: 0.75rem;">+23%</div>
+                                            <small class="text-muted" style="font-size: 0.65rem; font-weight: 500;">Growth</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="text-center py-2 px-2 rounded-2" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(217, 119, 6, 0.12)); border: 1px solid rgba(245, 158, 11, 0.15);">
+                                            <div class="fw-bold text-warning" style="font-size: 0.75rem;">42s</div>
+                                            <small class="text-muted" style="font-size: 0.65rem; font-weight: 500;">Avg Time</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Side - Quick Actions (30% width) -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-lg h-100" style="border-radius: 1.5rem;">
+                        <div class="card-header bg-light" style="border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem;">
+                            <h5 class="mb-0 fw-bold text-dark fs-5">
+                                <i class="fas fa-bolt me-2 text-primary"></i>
+                                Quick Actions
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-3 mb-4">
+                                <a class="btn btn-primary btn-lg fw-semibold hover-lift" href="/evaluation" style="border-radius: 12px; padding: 0.875rem;">
+                                    <i class="fas fa-rocket me-2"></i>
+                                    Start Evaluating
+                                </a>
+                                <a class="btn btn-outline-primary btn-lg fw-semibold hover-lift" href="/analytics" style="border-radius: 12px; padding: 0.875rem;">
+                                    <i class="fas fa-chart-bar me-2"></i>
+                                    View Full Analytics
+                                </a>
+                                <button class="btn btn-outline-success btn-lg fw-semibold hover-lift" style="border-radius: 12px; padding: 0.875rem;">
+                                    <i class="fas fa-play me-2"></i>
+                                    Watch Demo
+                                </button>
+                            </div>
+                            
+                            <hr class="my-4">
+                            
+                            <!-- Recent Activity -->
+                            <div>
+                                <h6 class="fw-bold mb-3 text-dark fs-6">
+                                    <i class="fas fa-clock me-2 text-muted"></i>
+                                    Recent Activity
+                                </h6>
+                                <div class="space-y-3">
+                                    <div class="d-flex justify-content-between align-items-center p-2 rounded-3" style="background: #f8fafc;">
+                                        <div class="text-start">
+                                            <small class="text-dark fw-semibold d-block">Math Quiz - Grade 10</small>
+                                            <small class="text-muted">2 hours ago</small>
+                                        </div>
+                                        <span class="badge bg-success" style="border-radius: 8px;">Completed</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center p-2 rounded-3" style="background: #f8fafc;">
+                                        <div class="text-start">
+                                            <small class="text-dark fw-semibold d-block">English Essay - Grade 12</small>
+                                            <small class="text-muted">4 hours ago</small>
+                                        </div>
+                                        <span class="badge bg-warning" style="border-radius: 8px;">In Progress</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center p-2 rounded-3" style="background: #f8fafc;">
+                                        <div class="text-start">
+                                            <small class="text-dark fw-semibold d-block">Science Test - Grade 9</small>
+                                            <small class="text-muted">1 day ago</small>
+                                        </div>
+                                        <span class="badge bg-info" style="border-radius: 8px;">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="fw-bold mb-3">Ready to Transform Your Grading Process?</h2>
+                    <p class="lead text-muted mb-4">
+                        Join thousands of educators who have already streamlined their assessment workflow.
+                    </p>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a class="btn btn-primary btn-lg" href="/auth/teacher_signup.html">
+                            <i class="fas fa-rocket me-2"></i>Start Free Trial
+                        </a>
+                        <a class="btn btn-outline-primary btn-lg" href="/pricing.html">
+                            <i class="fas fa-tags me-2"></i>View Pricing
+                        </a>
+                        <button class="btn btn-success btn-lg" onclick="showContactModal()">
+                            <i class="fas fa-envelope me-2"></i>Contact Sales
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-graduation-cap me-2 fs-3 text-primary"></i>
+                        <h5 class="fw-bold text-white mb-0">AI Grading Platform</h5>
+                    </div>
+                    <p class="text-muted mb-4">Revolutionizing education through intelligent automation and advanced AI technology.</p>
+                    <div class="d-flex gap-3">
+                        <a href="https://linkedin.com/company/ai-grading-platform" class="social-link linkedin" target="_blank" data-bs-toggle="tooltip" title="Follow us on LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="https://github.com/ai-grading-platform" class="social-link github" target="_blank" data-bs-toggle="tooltip" title="View our GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-3">
+                    <h6 class="fw-semibold mb-3">Product</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/evaluation">Evaluation</a></li>
+                        <li class="mb-2"><a href="/analytics">Analytics</a></li>
+                        <li class="mb-2"><a href="/pricing.html">Pricing</a></li>
+                        <li class="mb-2"><a href="#">Demo</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2 col-md-3">
+                    <h6 class="fw-semibold mb-3">Company</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">About Us</a></li>
+                        <li class="mb-2"><a href="#">Careers</a></li>
+                        <li class="mb-2"><a href="#">Contact</a></li>
+                        <li class="mb-2"><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2 col-md-3">
+                    <h6 class="fw-semibold mb-3">Support</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">Help Center</a></li>
+                        <li class="mb-2"><a href="#">Documentation</a></li>
+                        <li class="mb-2"><a href="#">Community</a></li>
+                        <li class="mb-2"><a href="#">Status</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2 col-md-3">
+                    <h6 class="fw-semibold mb-3">Legal</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">Privacy Policy</a></li>
+                        <li class="mb-2"><a href="#">Terms of Service</a></li>
+                        <li class="mb-2"><a href="#">Security</a></li>
+                        <li class="mb-2"><a href="#">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="my-4 border-secondary">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0" style="color: var(--gray-300);">&copy; 2025 AI Grading Platform. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0" style="color: var(--gray-300);">Made with <i class="fas fa-heart text-danger"></i> for educators worldwide</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modals -->
+    <!-- Teacher Login Modal -->
+    <div class="modal fade" id="teacherLoginModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-xl">
+                <div class="modal-header border-0 pb-0">
+                    <div class="w-100 text-center">
+                        <div class="bg-primary rounded-circle mx-auto mb-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-chalkboard-teacher text-white fs-5"></i>
+                        </div>
+                        <h5 class="modal-title fw-bold">Teacher Login</h5>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <!-- Compact Login Box -->
+                <div class="modal-body p-3">
+                    <form id="teacherLoginForm" class="border rounded p-3" style="background-color: #f8f9fa;">
+                        <div class="mb-2">
+                            <input type="email" class="form-control form-control-sm" id="teacherEmail" placeholder="Email Address" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" class="form-control form-control-sm" id="teacherPassword" placeholder="Password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-sign-in-alt me-1"></i>Sign In
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Footer Section -->
+                <div class="modal-footer border-0 pt-0" style="background-color: #f8f9fa;">
+                    <div class="w-100">
+                        <div class="row g-2 text-center">
+                            <div class="col-3">
+                                <h6 class="fw-semibold mb-1 text-dark" style="font-size: 0.75rem;">Product</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-1"><a href="/evaluation" class="text-muted text-decoration-none" style="font-size: 0.7rem;">Evaluation</a></li>
+                                    <li class="mb-1"><a href="/analytics" class="text-muted text-decoration-none" style="font-size: 0.7rem;">Analytics</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-3">
+                                <h6 class="fw-semibold mb-1 text-dark" style="font-size: 0.75rem;">Company</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-1"><a href="#" class="text-muted text-decoration-none" style="font-size: 0.7rem;">About Us</a></li>
+                                    <li class="mb-1"><a href="#" class="text-muted text-decoration-none" style="font-size: 0.7rem;">Contact</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-3">
+                                <h6 class="fw-semibold mb-1 text-dark" style="font-size: 0.75rem;">Support</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-1"><a href="#" class="text-muted text-decoration-none" style="font-size: 0.7rem;">Help Center</a></li>
+                                    <li class="mb-1"><a href="#" class="text-muted text-decoration-none" style="font-size: 0.7rem;">Community</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-3">
+                                <h6 class="fw-semibold mb-1 text-dark" style="font-size: 0.75rem;">Legal</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-1"><a href="#" class="text-muted text-decoration-none" style="font-size: 0.7rem;">Privacy</a></li>
+                                    <li class="mb-1"><a href="#" class="text-muted text-decoration-none" style="font-size: 0.7rem;">Security</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <hr class="my-2 border-secondary">
+                        <div class="text-center">
+                            <p class="mb-0 text-muted" style="font-size: 0.7rem;">&copy; 2025 AI Grading Platform. Made with <i class="fas fa-heart text-danger"></i> for educators</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Modal -->
+    <div class="modal fade" id="demoModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content border-0 shadow-xl">
+                <div class="modal-header border-0 bg-primary text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-play-circle me-2"></i>
+                        AI Grading Platform Demo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <!-- Video Section -->
+                        <div class="col-lg-8">
+                            <div class="ratio ratio-16x9 rounded-3 overflow-hidden bg-light border">
+                                <div class="d-flex align-items-center justify-content-center bg-gradient-primary text-white">
+                                    <div class="text-center">
+                                        <i class="fas fa-play-circle fs-1 mb-3" style="opacity: 0.8;"></i>
+                                        <h4 class="mb-3">Interactive Demo Experience</h4>
+                                        <p class="mb-4 opacity-90">See how our AI-powered grading works in real-time</p>
+                                        <button class="btn btn-light btn-lg fw-semibold">
+                                            <i class="fas fa-mouse-pointer me-2"></i>
+                                            Try Live Demo
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Demo Features -->
+                        <div class="col-lg-4">
+                            <h6 class="fw-bold mb-3">What You'll See:</h6>
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item border-0 ps-0">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-file-upload text-primary fs-5"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1 fw-semibold">Upload Process</h6>
+                                            <small class="text-muted">See how easy it is to upload and process exam papers</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 ps-0">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-brain text-success fs-5"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1 fw-semibold">AI Analysis</h6>
+                                            <small class="text-muted">Watch our AI analyze and grade papers automatically</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 ps-0">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-chart-bar text-warning fs-5"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1 fw-semibold">Live Results</h6>
+                                            <small class="text-muted">View real-time analytics and grading results</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 ps-0">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-download text-info fs-5"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1 fw-semibold">Export Options</h6>
+                                            <small class="text-muted">Learn about our flexible export and sharing features</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h6 class="fw-bold mb-3">Demo Statistics:</h6>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <div class="text-center p-3 bg-light rounded-3">
+                                            <div class="fw-bold text-primary fs-5">2.3min</div>
+                                            <small class="text-muted">Demo Duration</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-center p-3 bg-light rounded-3">
+                                            <div class="fw-bold text-success fs-5">98%</div>
+                                            <small class="text-muted">Accuracy</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Close
+                    </button>
+                    <button type="button" class="btn btn-primary">
+                        <i class="fas fa-rocket me-2"></i>Start Interactive Demo
+                    </button>
+                    <button type="button" class="btn btn-success">
+                        <i class="fas fa-user-plus me-2"></i>Sign Up Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal fade" id="contactModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow-xl">
+                <div class="modal-header border-0 bg-success text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-envelope me-2"></i>
+                        Contact Our Team
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <!-- Contact Form -->
+                        <div class="col-lg-8">
+                            <form id="contactForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="contactName" class="form-label fw-semibold">Full Name</label>
+                                        <input type="text" class="form-control" id="contactName" placeholder="Enter your full name" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="contactEmail" class="form-label fw-semibold">Email Address</label>
+                                        <input type="email" class="form-control" id="contactEmail" placeholder="Enter your email" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="contactPhone" class="form-label fw-semibold">Phone Number</label>
+                                        <input type="tel" class="form-control" id="contactPhone" placeholder="Enter your phone number">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="contactInstitution" class="form-label fw-semibold">Institution</label>
+                                        <input type="text" class="form-control" id="contactInstitution" placeholder="School/University name">
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="contactSubject" class="form-label fw-semibold">Subject</label>
+                                        <select class="form-select" id="contactSubject" required>
+                                            <option value="">Select a topic</option>
+                                            <option value="sales">Sales Inquiry</option>
+                                            <option value="demo">Request Demo</option>
+                                            <option value="support">Technical Support</option>
+                                            <option value="pricing">Pricing Questions</option>
+                                            <option value="partnership">Partnership Opportunities</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="contactMessage" class="form-label fw-semibold">Message</label>
+                                        <textarea class="form-control" id="contactMessage" rows="4" placeholder="Tell us how we can help you..." required></textarea>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Contact Info -->
+                        <div class="col-lg-4">
+                            <h6 class="fw-bold mb-3">Get in Touch</h6>
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item border-0 ps-0">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-envelope text-primary fs-5"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1 fw-semibold">Email</h6>
+                                            <small class="text-muted">support@aigrading.com</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 ps-0">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-phone text-success fs-5"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1 fw-semibold">Phone</h6>
+                                            <small class="text-muted">+1 (555) 123-4567</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 ps-0">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-clock text-warning fs-5"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1 fw-semibold">Support Hours</h6>
+                                            <small class="text-muted">Mon-Fri: 9AM-6PM EST</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 ps-0">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-comments text-info fs-5"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1 fw-semibold">Live Chat</h6>
+                                            <small class="text-muted">Available 24/7</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 p-3 bg-light rounded-3">
+                                <h6 class="fw-bold mb-2">Response Time</h6>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small>Sales Inquiries:</small>
+                                    <small class="fw-semibold">< 2 hours</small>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small>Support Tickets:</small>
+                                    <small class="fw-semibold">< 4 hours</small>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small>General Inquiries:</small>
+                                    <small class="fw-semibold">< 24 hours</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-success">
+                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/navigation.js"></script>
+    <script>
+        // Login functions - Define these first before other scripts
+        window.openTeacherLogin = function() {
+            console.log('Teacher login button clicked');
+            window.location.href = '/auth/teacher_login.html';
+        };
+        
+        window.showDemo = function() {
+            console.log('Demo button clicked');
+            const modal = new bootstrap.Modal(document.getElementById('demoModal'));
+            modal.show();
+        };
+        
+        window.showContactModal = function() {
+            console.log('Contact modal button clicked');
+            const modal = new bootstrap.Modal(document.getElementById('contactModal'));
+            modal.show();
+        };
+        
+        window.submitContactForm = function() {
+            const form = document.getElementById('contactForm');
+            const formData = new FormData(form);
+            
+            // Get form values
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const phone = document.getElementById('contactPhone').value;
+            const institution = document.getElementById('contactInstitution').value;
+            const subject = document.getElementById('contactSubject').value;
+            const message = document.getElementById('contactMessage').value;
+            
+            // Basic validation
+            if (!name || !email || !subject || !message) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.querySelector('[onclick="submitContactForm()"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>Sending...';
+            submitBtn.disabled = true;
+            
+            // Simulate form submission
+            setTimeout(() => {
+                // Show success message
+                submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Message Sent!';
+                submitBtn.classList.remove('btn-success');
+                submitBtn.classList.add('btn-success');
+                
+                // Reset form and close modal after delay
+                setTimeout(() => {
+                    form.reset();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('contactModal'));
+                    modal.hide();
+                    
+                    // Reset button
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.classList.remove('btn-success');
+                    submitBtn.classList.add('btn-success');
+                    submitBtn.disabled = false;
+                    
+                    // Show success notification
+                    alert('Thank you for your message! We\'ll get back to you within 24 hours.');
+                }, 1500);
+            }, 2000);
+        };
+    </script>
+    <script type="module">
+        import { APIService } from '/static/js/api.js';
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('AI Grading Platform loaded with new theme!');
+            
+            // Initialize navigation
+            if (typeof NavigationManager !== 'undefined') {
+                window.navigationManager = new NavigationManager();
+            }
+            
+            // Add scroll effect to navbar
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 100) {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                    navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+                } else {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                    navbar.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                }
+            });
+            
+            // Animate stats on scroll
+            const observerOptions = {
+                threshold: 0.3,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.stats-card, .card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
+            });
+        });
+        
+        
+        // Form submissions for modals (if they exist)
+        const teacherForm = document.getElementById('teacherLoginForm');
+        if (teacherForm) {
+            teacherForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('teacherEmail').value;
+            const password = document.getElementById('teacherPassword').value;
+            
+            // Show loading state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<div class="spinner me-2"></div>Signing in...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Store demo user data
+                localStorage.setItem('currentUser', JSON.stringify({
+                    email: email,
+                    name: 'Demo Teacher',
+                    role: 'teacher',
+                    id: 1
+                }));
+                
+                localStorage.setItem('authToken', 'demo-teacher-token');
+                
+                // Show success message
+                submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Success!';
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-success');
+                
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1000);
+                
+            } catch (error) {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                alert('Login failed. Please try again.');
+            }
+        });
+        }
+        
+        // Utility functions
+        window.togglePassword = function(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        };
+        
+        window.startInteractiveDemo = function() {
+            // Close modal and redirect to demo
+            const modal = bootstrap.Modal.getInstance(document.getElementById('demoModal'));
+            modal.hide();
+            
+            setTimeout(() => {
+                window.location.href = '/evaluation';
+            }, 500);
+        };
+    </script>
+    
+    <!-- Enhanced UI Script -->
+    <script src="/static/js/enhanced-ui.js"></script>
+</body>
+</html>

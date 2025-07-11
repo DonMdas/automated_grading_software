@@ -1,0 +1,20 @@
+[project]
+name = "approach-1"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mord>=0.7",
+    "ollama>=0.5.1",
+    "pandas>=2.3.0",
+    "prodigy>=1.15.8",
+    "scikit-learn>=1.7.0",
+    "transformers[torch]>=4.52.4",
+    "xgboost>=3.0.2",
+]
+
+[tool.uv.workspace]
+members = [
+    "google_cls_connect",
+]

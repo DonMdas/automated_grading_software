@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teacher Sign Up - AI Grading Platform</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom Theme -->
+    <link href="/static/css/theme.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="fade-in">
+    <!-- Same Navigation Bar as Main Page -->
+    <nav class="navbar navbar-expand-lg fixed-top" style="padding: 0.15rem 0; background: rgba(255, 255, 255, 0.98) !important; backdrop-filter: blur(10px); box-shadow: 0 1px 10px rgba(0,0,0,0.1); min-height: 50px;">
+        <div class="container-fluid px-5" style="display: flex; align-items: center;">
+            <!-- Logo positioned to align with hero content -->
+            <a class="navbar-brand d-flex align-items-center" href="/" style="margin: 0; margin-right: auto; flex-shrink: 0; padding-left: 0;">
+                <i class="fas fa-graduation-cap me-2 text-primary" style="font-size: 1.5rem;"></i>
+                <span class="fw-bold" style="font-size: 1.1rem; color: var(--primary-blue); white-space: nowrap;">AI Grading Platform</span>
+            </a>
+            
+            <!-- Center navigation options - Always visible on desktop -->
+            <ul class="navbar-nav d-none d-lg-flex mx-auto" style="gap: 1.2rem; flex-shrink: 0;">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/evaluation" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-clipboard-check me-1"></i>Start Evaluating
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/analytics" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-chart-line me-1"></i>Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/pricing.html" style="padding: 0.4rem 0.8rem; border-radius: 5px; white-space: nowrap; font-size: 0.95rem;">
+                        <i class="fas fa-tags me-1"></i>Pricing
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Right side sign in options -->
+            <div class="d-none d-lg-flex align-items-center gap-2" style="flex-shrink: 0;">
+                <a class="btn btn-primary fw-semibold" href="/auth/teacher_login.html" style="padding: 0.35rem 0.9rem; border-radius: 5px; white-space: nowrap; font-size: 0.85rem;">
+                    <i class="fas fa-chalkboard-teacher me-1"></i>
+                    Teacher Sign In
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Signup Section -->
+    <section style="padding-top: 70px; min-height: 100vh;">
+        <div class="container-fluid px-5">
+            <div class="row h-100 align-items-center" style="min-height: calc(100vh - 70px);">
+                <!-- Left Panel - Welcome -->
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="pe-5">
+                        <div class="text-center mb-5">
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                <i class="fas fa-user-plus text-white" style="font-size: 3.5rem;"></i>
+                            </div>
+                        </div>
+                        <h2 class="display-5 fw-bold mb-4 text-center">Join Our Community</h2>
+                        <p class="lead mb-5 text-center text-muted">
+                            Create your teacher account and start revolutionizing your grading process today.
+                        </p>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <div class="bg-primary-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <i class="fas fa-clock text-primary fs-4"></i>
+                                    </div>
+                                    <h6 class="fw-semibold">Save 75% Time</h6>
+                                    <small class="text-muted">Automated grading saves hours</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <div class="bg-primary-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <i class="fas fa-graduation-cap text-primary fs-4"></i>
+                                    </div>
+                                    <h6 class="fw-semibold">10K+ Teachers</h6>
+                                    <small class="text-muted">Join our growing community</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <div class="bg-primary-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <i class="fas fa-shield-alt text-primary fs-4"></i>
+                                    </div>
+                                    <h6 class="fw-semibold">Secure & Private</h6>
+                                    <small class="text-muted">Your data is protected</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <div class="bg-primary-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <i class="fas fa-headset text-primary fs-4"></i>
+                                    </div>
+                                    <h6 class="fw-semibold">24/7 Support</h6>
+                                    <small class="text-muted">We're here to help</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Panel - Signup Form -->
+                <div class="col-lg-6">
+                    <div class="ps-lg-5">
+                        <div class="bg-white rounded-3 shadow-lg p-5" style="max-width: 500px; margin: 0 auto;">
+                            <div class="text-center mb-4">
+                                <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-user-plus text-white fs-2"></i>
+                                </div>
+                                <h3 class="fw-bold mb-2">Create Teacher Account</h3>
+                                <p class="text-muted">Start your free trial today</p>
+                            </div>
+                            
+                            <form id="teacherSignupForm">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="firstName" class="form-label fw-semibold">First Name</label>
+                                        <input type="text" class="form-control" id="firstName" placeholder="John" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="lastName" class="form-label fw-semibold">Last Name</label>
+                                        <input type="text" class="form-control" id="lastName" placeholder="Doe" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label fw-semibold">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="fas fa-envelope text-muted"></i>
+                                        </span>
+                                        <input type="email" class="form-control border-start-0" id="email" placeholder="john@school.edu" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="school" class="form-label fw-semibold">School/Institution</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="fas fa-school text-muted"></i>
+                                        </span>
+                                        <input type="text" class="form-control border-start-0" id="school" placeholder="Lincoln High School" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="subject" class="form-label fw-semibold">Primary Subject</label>
+                                    <select class="form-select" id="subject" required>
+                                        <option value="">Select your subject</option>
+                                        <option value="mathematics">Mathematics</option>
+                                        <option value="english">English</option>
+                                        <option value="science">Science</option>
+                                        <option value="history">History</option>
+                                        <option value="physics">Physics</option>
+                                        <option value="chemistry">Chemistry</option>
+                                        <option value="biology">Biology</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="password" class="form-label fw-semibold">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="fas fa-lock text-muted"></i>
+                                        </span>
+                                        <input type="password" class="form-control border-start-0" id="password" placeholder="Create a strong password" required>
+                                        <button class="btn btn-outline-secondary border-start-0" type="button">
+                                            <i class="fas fa-eye" id="passwordToggle"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text">Must be at least 8 characters long</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="confirmPassword" class="form-label fw-semibold">Confirm Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="fas fa-lock text-muted"></i>
+                                        </span>
+                                        <input type="password" class="form-control border-start-0" id="confirmPassword" placeholder="Confirm your password" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                        <label class="form-check-label" for="agreeTerms">
+                                            I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100 py-3 fw-semibold mb-4" style="border-radius: 10px;">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Create Teacher Account
+                                </button>
+                            </form>
+                            
+                            <div class="text-center">
+                                <p class="text-muted mb-3">Sign up with Google</p>
+                                <div class="d-grid mb-4">
+                                    <button class="btn btn-danger btn-lg" style="border-radius: 8px;">
+                                        <i class="fab fa-google me-2"></i>Continue with Google
+                                    </button>
+                                </div>
+                                <hr class="my-4">
+                                <p class="text-muted">
+                                    Already have an account? 
+                                    <a href="/auth/teacher_login.html" class="text-decoration-none fw-semibold">Sign In</a>
+                                </p>
+                                <p class="text-muted small">
+                                    <a href="/" class="text-decoration-none">
+                                        <i class="fas fa-arrow-left me-1"></i>Return to Homepage
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/navigation.js"></script>
+    <script>
+        // Password toggle functionality
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('passwordToggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordToggle.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                passwordToggle.className = 'fas fa-eye';
+            }
+        }
+        
+        // Form submission
+        document.getElementById('teacherSignupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                school: document.getElementById('school').value,
+                subject: document.getElementById('subject').value,
+                password: document.getElementById('password').value,
+                confirmPassword: document.getElementById('confirmPassword').value
+            };
+            
+            // Password validation
+            if (formData.password !== formData.confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            if (formData.password.length < 8) {
+                alert('Password must be at least 8 characters long!');
+                return;
+            }
+            
+            // Add loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Prepare data for API
+                const userData = {
+                    email: formData.email,
+                    username: formData.email.split('@')[0], // Use email prefix as username
+                    password: formData.password,
+                    full_name: `${formData.firstName} ${formData.lastName}`,
+                    role: "teacher"
+                };
+                
+                // Call registration API
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Registration successful
+                    alert('Account created successfully! You are now logged in.');
+                    
+                    // Store the access token
+                    localStorage.setItem('authToken', result.access_token);
+                    localStorage.setItem('userRole', 'teacher');
+                    localStorage.setItem('userEmail', formData.email);
+                    localStorage.setItem('userName', userData.full_name);
+                    
+                    // Redirect to dashboard
+                    window.location.href = '/dashboard';
+                } else {
+                    // Registration failed
+                    throw new Error(result.detail || 'Registration failed');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert(error.message || 'Registration failed. Please try again.');
+            } finally {
+                // Reset button state
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        // Real-time password confirmation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+</body>
+</html>

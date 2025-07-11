@@ -1,0 +1,11 @@
+{
+  "92": {
+    "answer": "A compiler is a program that translates source code written in a high-level programming language into machine code or bytecode. The main phases include lexical analysis (scanning), syntax analysis (parsing), semantic analysis, code generation, and optimization. Each phase processes the code differently to produce efficient executable output."
+  },
+  "93": {
+    "answer": "Inheritance in object-oriented programming allows a class to inherit properties and methods from another class. The parent class is called a superclass or base class, while the child class is called a subclass or derived class. This promotes code reuse and establishes an 'is-a' relationship between classes."
+  },
+  "94": {
+    "answer": "A database management system (DBMS) is software that manages and organizes data in databases. Key features include data storage, retrieval, security, backup and recovery, and transaction management. Examples include MySQL, PostgreSQL, and Oracle Database."
+  }
+}

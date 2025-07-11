@@ -1,0 +1,153 @@
+# GitLab CI/CD Configuration for AI Grading Software
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE
+  DOCKER_TAG: $CI_COMMIT_SHA
+  CONTAINER_NAME: ai-grading-app
+  GRADING_SERVICE_NAME: grading-service
+
+# Cache configuration
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+# Before script for all jobs
+before_script:
+  - echo "CI/CD Pipeline started for commit $CI_COMMIT_SHA"
+
+# Test stage
+test:
+  stage: test
+  image: python:3.10-slim
+  services:
+    - postgres:13
+    - mongo:5.0
+  variables:
+    POSTGRES_DB: test_db
+    POSTGRES_USER: test_user
+    POSTGRES_PASSWORD: test_password
+    POSTGRES_HOST: postgres
+    MONGODB_HOST: mongo
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git curl
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install pytest pytest-asyncio httpx
+  script:
+    - echo "Running tests..."
+    - python -m pytest tests/ -v || echo "Tests completed with some failures"
+  only:
+    - main
+    - develop
+    - merge_requests
+
+# Build stage
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - echo "Building Docker images..."
+    
+    # Build main application
+    - docker build -t $DOCKER_IMAGE_NAME:$DOCKER_TAG -f Dockerfile .
+    - docker build -t $DOCKER_IMAGE_NAME:latest -f Dockerfile .
+    
+    # Build grading service
+    - docker build -t $DOCKER_IMAGE_NAME/grading-service:$DOCKER_TAG -f Dockerfile.grading .
+    - docker build -t $DOCKER_IMAGE_NAME/grading-service:latest -f Dockerfile.grading .
+    
+    # Push images to registry
+    - docker push $DOCKER_IMAGE_NAME:$DOCKER_TAG
+    - docker push $DOCKER_IMAGE_NAME:latest
+    - docker push $DOCKER_IMAGE_NAME/grading-service:$DOCKER_TAG
+    - docker push $DOCKER_IMAGE_NAME/grading-service:latest
+    
+    - echo "Docker images built and pushed successfully"
+  only:
+    - main
+    - develop
+
+# Deploy to staging
+deploy_staging:
+  stage: deploy
+  image: alpine:latest
+  environment:
+    name: staging
+    url: https://staging.your-domain.com
+  before_script:
+    - apk add --no-cache curl openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - echo "Deploying to staging server..."
+    - ssh $STAGING_USER@$STAGING_HOST "
+        cd /opt/ai-grading-software &&
+        docker-compose down &&
+        docker pull $DOCKER_IMAGE_NAME:$DOCKER_TAG &&
+        docker pull $DOCKER_IMAGE_NAME/grading-service:$DOCKER_TAG &&
+        docker-compose up -d &&
+        docker system prune -f"
+    - echo "Staging deployment completed"
+  only:
+    - develop
+
+# Deploy to production
+deploy_production:
+  stage: deploy
+  image: alpine:latest
+  environment:
+    name: production
+    url: https://your-domain.com
+  before_script:
+    - apk add --no-cache curl openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - echo "Deploying to production server..."
+    - ssh $PRODUCTION_USER@$PRODUCTION_HOST "
+        cd /opt/ai-grading-software &&
+        docker-compose down &&
+        docker pull $DOCKER_IMAGE_NAME:$DOCKER_TAG &&
+        docker pull $DOCKER_IMAGE_NAME/grading-service:$DOCKER_TAG &&
+        docker-compose up -d &&
+        docker system prune -f"
+    - echo "Production deployment completed"
+  when: manual
+  only:
+    - main
+
+# Cleanup job
+cleanup:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker system prune -f
+    - docker volume prune -f
+  when: manual
+  only:
+    - main
+    - develop

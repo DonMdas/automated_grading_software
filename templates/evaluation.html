@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Evaluation Center - AI Grading Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/theme.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
+
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center" href="/evaluation.html">
+                <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                <span class="fw-bold">AI Grading Platform</span>
+            </a>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <a href="/dashboard.html" class="btn btn-sm btn-outline-secondary">Dashboard</a>
+                <a href="/analytics.html" class="btn btn-sm btn-outline-secondary">Analytics</a>
+                <div class="dropdown">
+                    <button class="btn btn-light btn-sm dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                        <img id="userProfileImage" class="rounded-circle" style="width: 24px; height: 24px;" alt="User">
+                        <span id="userDisplayName"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/profile.html">Profile</a></li>
+                        <li><button class="dropdown-item text-danger" onclick="handleLogout()">Logout</button></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-fluid py-4" style="margin-top: 60px;">
+        <div id="main-content">
+            <!-- Loading State -->
+            <div id="loading-state" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-3">Loading your workspace...</p>
+            </div>
+
+            <!-- Not Connected State -->
+            <div id="connect-classroom-state" class="d-none text-center py-5 card shadow-sm">
+                <div class="card-body">
+                    <i class="fab fa-google fa-3x text-primary mb-3"></i>
+                    <h3>Connect to Google Classroom</h3>
+                    <p class="text-muted">To get started, connect your Google Classroom account to view courses and assignments.</p>
+                    <button id="connect-google-btn" class="btn btn-primary btn-lg">
+                        <i class="fab fa-google me-2"></i> Connect Google Classroom
+                    </button>
+                </div>
+            </div>
+
+            <!-- Connected State - Courses View -->
+            <div id="courses-view" class="d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0">Your Google Classroom Courses</h3>
+                    <button id="refresh-courses-btn" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh
+                    </button>
+                </div>
+                <div id="courses-grid" class="row g-4">
+                    <!-- Course cards will be injected here -->
+                </div>
+            </div>
+
+            <!-- Coursework & Submissions View -->
+            <div id="coursework-view" class="d-none">
+                <div class="d-flex align-items-center mb-3">
+                    <button id="back-to-courses-btn" class="btn btn-light me-3"><i class="fas fa-arrow-left"></i></button>
+                    <h3 id="course-name-header" class="mb-0"></h3>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Assignments</h5>
+                            </div>
+                            <div id="coursework-list" class="list-group list-group-flush">
+                                <!-- Coursework items will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                         <div class="card">
+                            <div class="card-header">
+                                <h5 id="coursework-name-header" class="mb-0">Submissions</h5>
+                            </div>
+                            <div id="submissions-list" class="list-group list-group-flush">
+                                <!-- Submissions will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="/static/js/evaluation.js?v=1751781000"></script>
+</body>
+</html>

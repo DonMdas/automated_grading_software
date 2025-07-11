@@ -1,0 +1,232 @@
+// /static/js/evaluation.js
+
+import { api } from './api.js';
+import { protectPage } from './auth.js';
+
+let coursesCache = [];
+let currentCourseId = null;
+let currentCourseworkId = null;
+
+// Page elements
+const loadingState = document.getElementById('loading-state');
+const connectState = document.getElementById('connect-classroom-state');
+const coursesView = document.getElementById('courses-view');
+const courseworkView = document.getElementById('coursework-view');
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await protectPage();
+    initializePage();
+    addEventListeners();
+});
+
+async function initializePage() {
+    showLoading();
+    try {
+        const status = await api.checkGoogleAuthStatus();
+        if (status.has_google_linked) {
+            await displayCourses();
+        } else {
+            displayConnectView(status.auth_url);
+        }
+    } catch (error) {
+        console.error('Initialization failed:', error);
+        alert('Could not load your workspace. Please try again.');
+    } finally {
+        hideLoading();
+    }
+}
+
+function addEventListeners() {
+    document.getElementById('refresh-courses-btn').addEventListener('click', displayCourses);
+    document.getElementById('back-to-courses-btn').addEventListener('click', showCoursesView);
+}
+
+function showLoading() {
+    loadingState.classList.remove('d-none');
+    connectState.classList.add('d-none');
+    coursesView.classList.add('d-none');
+    courseworkView.classList.add('d-none');
+}
+
+function hideLoading() {
+    loadingState.classList.add('d-none');
+}
+
+function displayConnectView(authUrl) {
+    connectState.classList.remove('d-none');
+    document.getElementById('connect-google-btn').onclick = () => {
+        window.location.href = authUrl;
+    };
+}
+
+async function displayCourses() {
+    showCoursesView();
+    const grid = document.getElementById('courses-grid');
+    grid.innerHTML = '<div class="text-center py-5"><div class="spinner-border"></div></div>';
+    
+    try {
+        coursesCache = await api.getCourses();
+        if (coursesCache.length === 0) {
+            grid.innerHTML = '<div class="col-12"><div class="alert alert-info">No Google Classroom courses found.</div></div>';
+            return;
+        }
+
+        grid.innerHTML = coursesCache.map(course => `
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm hover-lift" style="cursor: pointer;" data-course-id="${course.id}">
+                    <div class="card-body">
+                        <h5 class="card-title">${course.name}</h5>
+                        <p class="card-subtitle mb-2 text-muted">${course.section || 'General'}</p>
+                        <p class="card-text small">${course.description || 'No description.'}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <span class="badge bg-primary">${course.courseState}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // Add click listeners to course cards
+        grid.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', () => {
+                displayCoursework(card.dataset.courseId);
+            });
+        });
+    } catch(error) {
+        grid.innerHTML = `<div class="col-12"><div class="alert alert-danger">Failed to load courses: ${error.message}</div></div>`;
+    }
+}
+
+async function displayCoursework(courseId) {
+    currentCourseId = courseId;
+    showCourseworkView();
+    
+    const course = coursesCache.find(c => c.id === courseId);
+    document.getElementById('course-name-header').textContent = course.name;
+
+    const list = document.getElementById('coursework-list');
+    list.innerHTML = '<div class="list-group-item text-center"><div class="spinner-border spinner-border-sm"></div></div>';
+    document.getElementById('submissions-list').innerHTML = '<div class="list-group-item text-muted">Select an assignment to view submissions.</div>';
+
+    try {
+        const coursework = await api.getCoursework(courseId);
+        if(coursework.length === 0) {
+            list.innerHTML = '<div class="list-group-item text-muted">No assignments found for this course.</div>';
+            return;
+        }
+
+        list.innerHTML = coursework.map(cw => `
+            <a href="#" class="list-group-item list-group-item-action" data-coursework-id="${cw.id}">
+                ${cw.title}
+            </a>
+        `).join('');
+
+        list.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                list.querySelectorAll('a').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                displaySubmissions(link.dataset.courseworkId, link.textContent);
+            });
+        });
+
+    } catch(error) {
+        list.innerHTML = `<div class="list-group-item text-danger">Failed to load assignments: ${error.message}</div>`;
+    }
+}
+
+// Find the displaySubmissions function in /static/js/evaluation.js and
+// replace its content with this version.
+
+// Find the displaySubmissions function in /static/js/evaluation.js and
+// replace its content with this version.
+
+async function displaySubmissions(courseworkId, courseworkName) {
+    currentCourseworkId = courseworkId;
+    document.getElementById('coursework-name-header').textContent = courseworkName;
+    const list = document.getElementById('submissions-list');
+    list.innerHTML = '<div class="list-group-item text-center"><div class="spinner-border spinner-border-sm"></div></div>';
+
+    const header = document.getElementById('coursework-name-header');
+    const existingButton = header.parentElement.querySelector('.evaluate-btn');
+    if (existingButton) existingButton.remove();
+
+    try {
+        const submissions = await api.getSubmissions(currentCourseId, courseworkId);
+        if (submissions.length === 0) {
+            list.innerHTML = '<div class="list-group-item text-muted">No submissions for this assignment yet.</div>';
+            return;
+        }
+
+        const evaluateButton = document.createElement('button');
+        evaluateButton.className = 'btn btn-success ms-auto evaluate-btn';
+        evaluateButton.innerHTML = `<i class="fas fa-play-circle me-2"></i> Evaluate All (${submissions.length})`;
+        
+        // This is the new click handler
+        evaluateButton.onclick = () => {
+            // Create a hidden file input
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.pdf'; // Only accept PDFs for the answer key
+            
+            // Listen for when the user selects a file
+            fileInput.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('answer_key', file);
+
+                try {
+                    evaluateButton.disabled = true;
+                    evaluateButton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Starting...';
+                    
+                    const response = await api.startEvaluationProcess(currentCourseId, courseworkId, formData);
+                    alert(response.message); // Show success message from backend
+                
+                } catch (error) {
+                    alert(`Error starting evaluation: ${error.message}`);
+                } finally {
+                     evaluateButton.disabled = false;
+                     evaluateButton.innerHTML = `<i class="fas fa-play-circle me-2"></i> Evaluate All (${submissions.length})`;
+                }
+            };
+            
+            // Trigger the file dialog
+            fileInput.click();
+        };
+
+        header.parentElement.appendChild(evaluateButton);
+
+        list.innerHTML = submissions.map(sub => `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>${sub.studentName || 'Unknown Student'}</strong><br>
+                    <small class="text-muted">Google Status: <span class="badge bg-secondary">${sub.state}</span></small>
+                </div>
+            </div>
+        `).join('');
+
+    } catch(error) {
+         list.innerHTML = `<div class="list-group-item text-danger">Failed to load submissions: ${error.message}</div>`;
+    }
+}
+
+window.startEvaluation = (submissionId) => {
+    // Here you would navigate to the annotation/grading interface
+    // For now, it's a placeholder
+    alert(`Starting evaluation for submission ID: ${submissionId}`);
+    // Example: window.location.href = `/annotation.html?submission=${submissionId}`;
+};
+
+function showCoursesView() {
+    coursesView.classList.remove('d-none');
+    courseworkView.classList.add('d-none');
+    connectState.classList.add('d-none');
+}
+
+function showCourseworkView() {
+    coursesView.classList.add('d-none');
+    courseworkView.classList.remove('d-none');
+    connectState.classList.add('d-none');
+}

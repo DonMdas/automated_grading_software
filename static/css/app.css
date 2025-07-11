@@ -1,0 +1,52 @@
+/* /static/css/app.css */
+
+/* --- Evaluation & Classroom --- */
+.course-card .card-title {
+    color: var(--primary-dark);
+}
+.course-card:hover {
+    border-color: var(--primary-color);
+}
+.list-group-item-action:hover, .list-group-item-action:focus {
+    background-color: #eff6ff;
+    color: var(--primary-dark);
+}
+.list-group-item.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* --- Analytics --- */
+.metric-card {
+    border-left: 4px solid var(--primary-color);
+}
+.metric-card .fa-2x { color: var(--primary-light); }
+.metric-card h4 { color: var(--dark-color); }
+.border-left-primary { border-left: 0.25rem solid var(--primary-color) !important; }
+.border-left-success { border-left: 0.25rem solid var(--success-color) !important; }
+.border-left-info { border-left: 0.25rem solid var(--info-color) !important; }
+.border-left-warning { border-left: 0.25rem solid var(--warning-color) !important; }
+.text-xs { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05rem; }
+.chart-container { position: relative; height: 300px; width: 100%; }
+
+/* --- Annotation --- */
+.annotation-canvas {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    background-color: #f8f9fa;
+    cursor: crosshair;
+}
+.comments-list { padding: 0; }
+.comment-item { padding: 0.75rem; border-bottom: 1px solid var(--gray-100); }
+.comment-item:last-child { border-bottom: none; }
+
+/* --- Loading States --- */
+.loading-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; border-radius: inherit;
+}

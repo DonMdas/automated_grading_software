@@ -1,0 +1,41 @@
+# Simple Docker Compose - Main app only (use external databases)
+version: '3.8'
+
+services:
+  # Main AI Grading Application Only
+  ai-grading-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # Database Configuration (external)
+      - POSTGRES_HOST=${POSTGRES_HOST:-localhost}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE:-grading_system_pg}
+      
+      # MongoDB Configuration (external)
+      - MONGODB_HOST=${MONGODB_HOST:-localhost}
+      - MONGODB_PORT=${MONGODB_PORT:-27017}
+      - MONGODB_DATABASE=${MONGODB_DATABASE:-grading_system_mongo}
+      
+      # Google OAuth Configuration
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+      
+      # Application Configuration
+      - SECRET_KEY=${SECRET_KEY}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - ./server_data:/app/server_data
+      - ./static:/app/static
+      - ./templates:/app/templates
+      - ./grading-fastapi:/app/grading-fastapi
+      - ./training_data:/app/training_data
+    restart: unless-stopped
+    network_mode: "host"  # Use host network to access external databases

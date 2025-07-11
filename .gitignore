@@ -53,6 +53,7 @@ server_data/
 uv.lock
 app_data.db
 training_data/*.csv
+Pratik_UI/backend/client_secrets.json
 
 # Test files
 test_*

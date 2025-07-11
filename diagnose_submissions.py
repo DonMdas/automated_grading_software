@@ -77,7 +77,9 @@ def check_server_status():
     
     try:
         import requests
-        response = requests.get("http://127.0.0.1:8000/api/submissions/test", timeout=5)
+        import os
+        base_url = os.getenv("BASE_URL", "http://127.0.0.1:8000")
+        response = requests.get(f"{base_url}/api/submissions/test", timeout=5)
         if response.status_code == 200:
             print("✅ Server is running and responding")
             return True
@@ -98,7 +100,7 @@ def provide_debugging_steps():
     print("   - Check the submission states (TURNED_IN, CREATED, etc.)")
     
     print("\n2. Check the debug endpoint:")
-    print("   - Go to: http://127.0.0.1:8000/api/submissions/debug-classroom/{course_id}/{coursework_id}")
+    print("   - Go to: /api/submissions/debug-classroom/{course_id}/{coursework_id}")
     print("   - Replace {course_id} and {coursework_id} with actual values")
     print("   - This will show you exactly what Google Classroom API returns")
     

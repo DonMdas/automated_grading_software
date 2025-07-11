@@ -986,11 +986,11 @@ async def get_demo_analytics():
                 {"question": "Question 9: Probability Distributions", "failure_rate": 28.9}
             ],
             "top_performers": [
-                {"student": "Alice Johnson", "average_grade": 95.2},
-                {"student": "Bob Chen", "average_grade": 92.8},
-                {"student": "Carol Davis", "average_grade": 89.5},
-                {"student": "David Wilson", "average_grade": 87.3},
-                {"student": "Emma Rodriguez", "average_grade": 85.9}
+                {"student": "Mukund Tekriwal", "average_grade": 95.2},
+                {"student": "Dhruv Jetty", "average_grade": 92.8},
+                {"student": "Rishi Reddy", "average_grade": 89.5},
+                {"student": "Deevan Kumar", "average_grade": 87.3},
+                {"student": "Keeran Dhami", "average_grade": 85.9}
             ],
             "key_insights": {
                 "total_questions_analyzed": 20,
@@ -1047,7 +1047,7 @@ async def get_demo_analytics():
             }
         },
         "students": {
-            "Alice Johnson": {
+            "Mukund Tekriwal": {
                 "average_grade": 95.2,
                 "grade_trend": "improving",
                 "overall_accuracy": 94.5,
@@ -1063,7 +1063,7 @@ async def get_demo_analytics():
                 },
                 "frequently_missed_questions": {}
             },
-            "Bob Chen": {
+            "Dhruv Jetty": {
                 "average_grade": 92.8,
                 "grade_trend": "stable",
                 "overall_accuracy": 91.2,
@@ -1081,7 +1081,7 @@ async def get_demo_analytics():
                     "Question 3": 85.0
                 }
             },
-            "Carol Davis": {
+            "Rishi Reddy": {
                 "average_grade": 89.5,
                 "grade_trend": "improving",
                 "overall_accuracy": 87.9,
@@ -1099,7 +1099,7 @@ async def get_demo_analytics():
                     "Question 3": 78.0
                 }
             },
-            "David Wilson": {
+            "Deevan Kumar": {
                 "average_grade": 87.3,
                 "grade_trend": "stable",
                 "overall_accuracy": 85.1,
@@ -1117,7 +1117,7 @@ async def get_demo_analytics():
                     "Question 3": 75.0
                 }
             },
-            "Emma Rodriguez": {
+            "Keeran Dhami": {
                 "average_grade": 85.9,
                 "grade_trend": "improving",
                 "overall_accuracy": 83.4,
@@ -1133,26 +1133,6 @@ async def get_demo_analytics():
                 },
                 "frequently_missed_questions": {
                     "Question 3": 72.0
-                }
-            },
-            "Frank Miller": {
-                "average_grade": 45.2,
-                "grade_trend": "declining",
-                "overall_accuracy": 42.1,
-                "learning_growth_rate": -5.3,
-                "standard_deviation": 16.8,
-                "total_exams": 8,
-                "question_wise_accuracy": {
-                    "Question 1": 52.0,
-                    "Question 2": 38.0,
-                    "Question 3": 25.0,
-                    "Question 4": 48.0,
-                    "Question 5": 35.0
-                },
-                "frequently_missed_questions": {
-                    "Question 2": 38.0,
-                    "Question 3": 25.0,
-                    "Question 5": 35.0
                 }
             }
         },

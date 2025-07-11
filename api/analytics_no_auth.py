@@ -35,9 +35,9 @@ async def get_summary_analytics_no_auth(
             "85-100": 28.6
         },
         "top_performers": [
-            {"student": "Alice Johnson", "average_grade": 94.2},
-            {"student": "Bob Chen", "average_grade": 91.8},
-            {"student": "Carol Davis", "average_grade": 89.5}
+            {"student": "Mukund Tekriwal", "average_grade": 94.2},
+            {"student": "Dhruv Jetty", "average_grade": 91.8},
+            {"student": "Rishi Reddy", "average_grade": 89.5}
         ],
         "key_insights": {
             "total_questions_analyzed": 15,
@@ -124,7 +124,7 @@ async def get_student_analytics_no_auth(
         "status": "success",
         "data": {
             "student_1": {
-                "name": "Alice Johnson",
+                "name": "Mukund Tekriwal",
                 "student_id": "student_1",
                 "average_score": 94.2,
                 "trend": "improving",
@@ -135,7 +135,7 @@ async def get_student_analytics_no_auth(
                 "performance_category": "high_performer"
             },
             "student_2": {
-                "name": "Bob Chen",
+                "name": "Dhruv Jetty",
                 "student_id": "student_2", 
                 "average_score": 87.6,
                 "trend": "stable",
@@ -146,7 +146,7 @@ async def get_student_analytics_no_auth(
                 "performance_category": "above_average"
             },
             "student_3": {
-                "name": "Carol Davis",
+                "name": "Rishi Reddy",
                 "student_id": "student_3",
                 "average_score": 91.8,
                 "trend": "improving",
@@ -157,7 +157,7 @@ async def get_student_analytics_no_auth(
                 "performance_category": "high_performer"
             },
             "student_4": {
-                "name": "David Wilson",
+                "name": "Deevan Kumar",
                 "student_id": "student_4",
                 "average_score": 76.3,
                 "trend": "declining",
@@ -168,7 +168,7 @@ async def get_student_analytics_no_auth(
                 "performance_category": "needs_attention"
             },
             "student_5": {
-                "name": "Emma Rodriguez",
+                "name": "Keeran Dhami",
                 "student_id": "student_5",
                 "average_score": 83.4,
                 "trend": "stable",

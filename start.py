@@ -79,8 +79,15 @@ def main():
         return False
     
     print("\n✅ Startup completed successfully!")
-    print("🌐 Application will be available at: http://localhost:8000")
-    print("📚 API documentation: http://localhost:8000/docs")
+    
+    # Get the application URL from environment or use default
+    app_port = os.getenv("APP_PORT", "8000")
+    domain = os.getenv("DOMAIN", "localhost")
+    protocol = "https" if os.getenv("SSL_CERT_PATH") else "http"
+    app_url = f"{protocol}://{domain}:{app_port}"
+    
+    print(f"🌐 Application will be available at: {app_url}")
+    print(f"📚 API documentation: {app_url}/docs")
     print("\nPress Ctrl+C to stop the application")
     print("-" * 50)
     

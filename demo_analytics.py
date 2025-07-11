@@ -7,9 +7,11 @@ This can be used when the server is running to test the API endpoints.
 import json
 import asyncio
 import aiohttp
+import os
 from datetime import datetime
 
-BASE_URL = "http://localhost:8000"
+# Use relative URL - will work with any domain/port
+BASE_URL = ""
 
 async def test_analytics_endpoints():
     """Test all analytics endpoints"""
@@ -98,7 +100,7 @@ async def test_analytics_endpoints():
     print("1. Start the server: python -m uvicorn main:app --reload")
     print("2. Login and create some courses/assignments")
     print("3. Run some grading tasks")
-    print("4. Visit http://localhost:8000/analytics.html")
+    print("4. Visit /analytics.html")
     print("5. Or use this script with real course IDs")
 
 def print_sample_data():

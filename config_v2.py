@@ -12,9 +12,12 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # Google OAuth Configuration
+# Google OAuth Configuration  
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
+# Construct redirect URI from BASE_URL if available, otherwise use environment variable
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", f"{BASE_URL}/api/classroom/auth-callback")
 
 # Google OAuth Scopes
 SCOPES = [
